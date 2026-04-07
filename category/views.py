@@ -11,7 +11,7 @@ from django.core.paginator import Paginator
 def category_list(request):
     query = request.GET.get('q')
 
-    categories = Category.objects.all().order_by('-id')
+    categories = Category.objects.filter(is_active=True).order_by('-id')
 
     # categories = Category.objects.annotate(
     #     product_count=Count('product')
@@ -55,14 +55,15 @@ def add_category(request):
 
 @login_required(login_url='admin_login')
 def edit_category(request,id):
-    category = Category.objects.get(id=id)
-
-    if request.FILES.get('image'):
-        category.image = request.FILES.get('image')
+    category = get_object_or_404(Category, id=id)
 
     if request.method == 'POST':
         category.name = request.POST.get('name')
         category.description = request.POST.get('description')
+
+        if request.FILES.get('image'):
+            category.image = request.FILES.get('image')
+
         category.save()
 
         messages.success(request,'Category Updated Successfully')
