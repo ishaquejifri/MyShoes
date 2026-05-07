@@ -4,32 +4,32 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count
 from django.core.paginator import Paginator
+from django.views.decorators.cache import never_cache
 
 # Create your views here.
-
+@never_cache
 @login_required(login_url='admin_login')
 def category_list(request):
     query = request.GET.get('q')
 
-    categories = Category.objects.filter(is_active=True).order_by('-id')
-
-    # categories = Category.objects.annotate(
-    #     product_count=Count('product')
-    # )
+    
+    categories = Category.objects.annotate(
+        product_count=Count('product')
+    ).order_by('-id')
 
     if query:
         categories = categories.filter(name__icontains=query)
 
-    paginator = Paginator(categories,5)
-    page_number = request.GET.get('page')
+    paginator = Paginator(categories,5)  
+    page_number = request.GET.get('page')  
     page_obj = paginator.get_page(page_number)    
 
-    return render(request,'category_list.html',{
+    return render(request,'category_list.html',{  
         'page_obj': page_obj,
-        'query': query
+        'query': query   
     }) 
 
-
+@never_cache
 @login_required(login_url='admin_login')
 def add_category(request):
     if request.method == 'POST':
@@ -52,7 +52,7 @@ def add_category(request):
 
     return render(request, 'add_category.html')
 
-
+@never_cache
 @login_required(login_url='admin_login')
 def edit_category(request,id):
     category = get_object_or_404(Category, id=id)
@@ -73,7 +73,7 @@ def edit_category(request,id):
         'category': category
     })
 
-
+@never_cache
 @login_required(login_url='admin_login')
 def toggle_category_status(request,id):
     category = Category.objects.get(id=id)
@@ -82,7 +82,7 @@ def toggle_category_status(request,id):
 
     return redirect('category_list')
 
-
+@never_cache
 @login_required(login_url='admin_login')
 def delete_category(request,id):
     category = Category.objects.get(id=id)

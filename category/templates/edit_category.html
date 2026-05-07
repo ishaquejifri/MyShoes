@@ -22,7 +22,7 @@
               <div class="flex flex-col gap-4">
                 <h1 class="text-white text-base font-medium leading-normal">Lotto Shoes</h1>
                 <div class="flex flex-col gap-2">
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  <a href="{% url 'admin_dashboard'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="House" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -31,8 +31,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Dashboard</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="{% url 'products:product_list'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Boot" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -41,8 +41,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Products</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="ListBullets" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -51,8 +51,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Orders</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#283932]">
+                  </a>
+                  <a href="{% url 'category_list'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Tag" data-size="24px" data-weight="fill">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -61,8 +61,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Categories</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="{% url 'user_list'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Users" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -71,8 +71,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Users</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="PresentationChart" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -81,8 +81,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Sales Report</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Image" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -91,8 +91,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Banners</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Tag" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -101,8 +101,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Offers</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Ticket" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -111,8 +111,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Coupons</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Gear" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -121,7 +121,7 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Settings</p>
-                  </div>
+                  </a>
                 </div>
               </div>
               <button
@@ -145,17 +145,17 @@
             <form method="POST" enctype="multipart/form-data">
               {% csrf_token %}
             <div class="p-4 @container">
-              <div class="flex flex-col items-stretch justify-start rounded-lg @xl:flex-row @xl:items-start">
+              <div class="flex flex-col md:flex-row items-start gap-6 rounded-lg">
                <img 
                     id='imagePreview'
                     src="{% if category.image %} {{ category.image.url}} {% else %} /static/default.jpg {% endif %}"
-                    class="w-full aspect-video object-cover rounded-lg"/>
+                    class="w-full max-w-[250px] h-40 object-cover rounded-lg border border-[#283932]"/>
                 <div class="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-1 py-4 @xl:px-4">
                   <p class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Category Thumbnail</p>
                   <div class="flex items-end gap-3 justify-between">
                     <p class="text-[#9cbaad] text-base font-normal leading-normal">Upload an image for the category</p>
                   <label class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-[#0ac275] text-[#111815] text-sm font-medium leading-normal">
-                    <span class="truncate">Upload Image</span>
+                    <span class="truncate">Edit Image</span>
                     <input type="file" name="image" class="hidden" onchange="previewImage(event)">
                   </label>
                   </div>

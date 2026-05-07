@@ -8,9 +8,9 @@
       href="https://fonts.googleapis.com/css2?display=swap&amp;family=Manrope%3Awght%40400%3B500%3B700%3B800&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
     />
 
-    <title>Stitch Design</title>
+    <title>Edit Product</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
-
+    <link rel="stylesheet" href="https://unpkg.com/cropperjs/dist/cropper.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   </head>
   <body>
@@ -23,9 +23,9 @@
           <div class="layout-content-container flex flex-col w-80">
             <div class="flex h-full min-h-[700px] flex-col justify-between bg-[#12211c] p-4">
               <div class="flex flex-col gap-4">
-                <h1 class="text-white text-base font-medium leading-normal">Footwear Co.</h1>
+                <h1 class="text-white text-base font-medium leading-normal">Lotto Shoes</h1>
                 <div class="flex flex-col gap-2">
-                  <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#25463b]">
+                  <a href="{% url 'admin_dashboard' %}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="House" data-size="24px" data-weight="fill">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -34,8 +34,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Dashboard</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="{% url 'products:product_list' %}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="GridFour" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -44,8 +44,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Products</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="ListBullets" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -54,8 +54,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Orders</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="{% url 'category_list' %}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Tag" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -64,8 +64,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Categories</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="{% url 'user_list' %}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Users" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -74,8 +74,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Users</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="PresentationChart" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -84,8 +84,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Sales Report</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Image" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -94,8 +94,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Banners</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Percent" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -104,8 +104,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Offers</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Ticket" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -114,8 +114,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Coupons</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Gear" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -124,54 +124,104 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Settings</p>
-                  </div>
+                  </a>
                 </div>
               </div>
+              <form action="{% url 'admin_logout' %}" method="post">
+                {% csrf_token %}
               <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#107f5a] text-white text-sm font-bold leading-normal tracking-[0.015em]"
+                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#0ac275] text-[#10231b] text-sm font-bold leading-normal tracking-[0.015em]"
               >
                 <span class="truncate">Logout</span>
               </button>
+            </form>
             </div>
           </div>
           <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+            {% if form.errors %}
+            <div class="text-red-500 px-4">
+            {{ form.errors }}
+            </div>
+            {% endif %}
+            <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
             <div class="flex flex-wrap justify-between gap-3 p-4"><p class="text-white tracking-light text-[32px] font-bold leading-tight min-w-72">Edit Product</p></div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-white text-base font-medium leading-normal pb-2">Product Name</p>
                 <input
+                  name="product_name"
+                  placeholder="Enter product name"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#356454] bg-[#1a322a] focus:border-[#356454] h-14 placeholder:text-[#94c7b6] p-[15px] text-base font-normal leading-normal"
-                  value=""
+                  value="{{ form.product_name.value|default:'' }}"
                 />
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
-                <p class="text-white text-base font-medium leading-normal pb-2">SKU</p>
+                <p class="text-white text-base font-medium leading-normal pb-2">Slug</p>
                 <input
+                  name="slug"
+                  placeholder="Enter slug feild"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#356454] bg-[#1a322a] focus:border-[#356454] h-14 placeholder:text-[#94c7b6] p-[15px] text-base font-normal leading-normal"
-                  value=""
+                  value="{{ form.slug.value|default:'' }}"
                 />
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
-                <p class="text-white text-base font-medium leading-normal pb-2">Price</p>
+                <p class="text-white text-base font-medium leading-normal pb-2">Amount</p>
                 <input
+                  type="number"
+                  name="base_price"
+                  placeholder="Enter amount"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#356454] bg-[#1a322a] focus:border-[#356454] h-14 placeholder:text-[#94c7b6] p-[15px] text-base font-normal leading-normal"
-                  value=""
+                  value="{{ form.base_price.value|default:'' }}"
+                />
+              </label>
+            </div>
+            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+              <label class="flex flex-col min-w-40 flex-1">
+                <p class="text-white text-base font-medium leading-normal pb-2">Offer</p>
+                <input
+                  type="number"
+                  name="offer_price"
+                  placeholder="Enter offer"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#356454] bg-[#1a322a] focus:border-[#356454] h-14 placeholder:text-[#94c7b6] p-[15px] text-base font-normal leading-normal"
+                  value="{{ form.offer_price.value|default:'' }}"
+                />
+              </label>
+            </div>
+            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
+              <label class="flex flex-col min-w-40 flex-1">
+                <p class="text-white text-base font-medium leading-normal pb-2">Stock</p>
+                <input
+                  type="number"
+                  name="stock"
+                  placeholder="Enter Stock"
+                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#356454] bg-[#1a322a] focus:border-[#356454] h-14 placeholder:text-[#94c7b6] p-[15px] text-base font-normal leading-normal"
+                  value="{{ form.stock.value|default:'' }}"
                 />
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-white text-base font-medium leading-normal pb-2">Category</p>
-                <select
+               <select
+                  name="category"
+                  required
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#356454] bg-[#1a322a] focus:border-[#356454] h-14 bg-[image:--select-button-svg] placeholder:text-[#94c7b6] p-[15px] text-base font-normal leading-normal"
                 >
-                  <option value="one"></option>
-                  <option value="two">two</option>
-                  <option value="three">three</option>
+                  <option value="">Select Category</option>
+                  {% for category in categories %}
+                  <option value="{{ category.id }}"
+                    {% if form.category.value|stringformat:"s" == category.id|stringformat:"s" %}
+                    selected
+                    {% endif %}
+                  >
+                    {{category.name}}                 
+                  </option>
+                  {% endfor %}
                 </select>
               </label>
             </div>
@@ -179,124 +229,74 @@
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-white text-base font-medium leading-normal pb-2">Product Description</p>
                 <textarea
+                  name="description"
+                  placeholder="Enter product description"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#356454] bg-[#1a322a] focus:border-[#356454] min-h-36 placeholder:text-[#94c7b6] p-[15px] text-base font-normal leading-normal"
-                ></textarea>
+                >{{ form.description.value|default:'' }}</textarea>
               </label>
             </div>
             <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Product Images</h2>
             <div class="flex flex-col p-4">
-              <div class="flex flex-col items-center gap-6 rounded-lg border-2 border-dashed border-[#356454] px-6 py-14">
-                <div class="flex max-w-[480px] flex-col items-center gap-2">
-                  <p class="text-white text-lg font-bold leading-tight tracking-[-0.015em] max-w-[480px] text-center">Upload Product Image</p>
-                  <p class="text-white text-sm font-normal leading-normal max-w-[480px] text-center">Click to upload or drag and drop</p>
-                </div>
-                <button
-                  class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#25463b] text-white text-sm font-bold leading-normal tracking-[0.015em]"
-                >
-                  <span class="truncate">Upload</span>
-                </button>
-              </div>
+              <div class="flex flex-col p-4">
+             <div class="rounded-lg border-2 border-dashed border-[#356454] px-6 py-8">
+
+               {% if product.image %}
+                <div class="w-full flex flex-col items-center mb-6">
+                <p class="text-white mb-2 font-medium">Current Main Image:</p>
+                <img src="{{ product.image.url }}" class="w-48 h-48 object-cover rounded-lg border-2 border-[#356454] shadow-md">
+                 </div>
+                 {% endif %}
+
+                <div class="text-center">
+                 <p class="text-white text-lg font-bold">Upload New Main Image</p>
+                <input type="file" name="image" accept="image/*" class="mt-4 text-white">
+               </div>
+
+             </div>
+            </div>
             </div>
             <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Gallery Images</h2>
             <div class="flex flex-col p-4">
-              <div class="flex flex-col items-center gap-6 rounded-lg border-2 border-dashed border-[#356454] px-6 py-14">
-                <div class="flex max-w-[480px] flex-col items-center gap-2">
-                  <p class="text-white text-lg font-bold leading-tight tracking-[-0.015em] max-w-[480px] text-center">Upload Gallery Image 1</p>
-                  <p class="text-white text-sm font-normal leading-normal max-w-[480px] text-center">Click to upload or drag and drop</p>
-                </div>
-                <button
-                  class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#25463b] text-white text-sm font-bold leading-normal tracking-[0.015em]"
-                >
-                  <span class="truncate">Upload</span>
-                </button>
-              </div>
-            </div>
-            <div class="flex flex-col p-4">
-              <div class="flex flex-col items-center gap-6 rounded-lg border-2 border-dashed border-[#356454] px-6 py-14">
-                <div class="flex max-w-[480px] flex-col items-center gap-2">
-                  <p class="text-white text-lg font-bold leading-tight tracking-[-0.015em] max-w-[480px] text-center">Upload Gallery Image 2</p>
-                  <p class="text-white text-sm font-normal leading-normal max-w-[480px] text-center">Click to upload or drag and drop</p>
-                </div>
-                <button
-                  class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#25463b] text-white text-sm font-bold leading-normal tracking-[0.015em]"
-                >
-                  <span class="truncate">Upload</span>
-                </button>
-              </div>
-            </div>
-            <div class="flex flex-col p-4">
-              <div class="flex flex-col items-center gap-6 rounded-lg border-2 border-dashed border-[#356454] px-6 py-14">
-                <div class="flex max-w-[480px] flex-col items-center gap-2">
-                  <p class="text-white text-lg font-bold leading-tight tracking-[-0.015em] max-w-[480px] text-center">Upload Gallery Image 3</p>
-                  <p class="text-white text-sm font-normal leading-normal max-w-[480px] text-center">Click to upload or drag and drop</p>
-                </div>
-                <button
-                  class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#25463b] text-white text-sm font-bold leading-normal tracking-[0.015em]"
-                >
-                  <span class="truncate">Upload</span>
-                </button>
-              </div>
-            </div>
-            <h2 class="text-white text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Stock &amp; Sizes</h2>
-            <div class="px-4 py-3 @container">
-              <div class="flex overflow-hidden rounded-lg border border-[#356454] bg-[#12211c]">
-                <table class="flex-1">
-                  <thead>
-                    <tr class="bg-[#1a322a]">
-                      <th class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-120 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Size</th>
-                      <th class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-240 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Stock</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr class="border-t border-t-[#356454]">
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-120 h-[72px] px-4 py-2 w-[400px] text-white text-sm font-normal leading-normal">7</td>
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-240 h-[72px] px-4 py-2 w-[400px] text-[#94c7b6] text-sm font-normal leading-normal">15</td>
-                    </tr>
-                    <tr class="border-t border-t-[#356454]">
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-120 h-[72px] px-4 py-2 w-[400px] text-white text-sm font-normal leading-normal">8</td>
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-240 h-[72px] px-4 py-2 w-[400px] text-[#94c7b6] text-sm font-normal leading-normal">20</td>
-                    </tr>
-                    <tr class="border-t border-t-[#356454]">
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-120 h-[72px] px-4 py-2 w-[400px] text-white text-sm font-normal leading-normal">9</td>
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-240 h-[72px] px-4 py-2 w-[400px] text-[#94c7b6] text-sm font-normal leading-normal">25</td>
-                    </tr>
-                    <tr class="border-t border-t-[#356454]">
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-120 h-[72px] px-4 py-2 w-[400px] text-white text-sm font-normal leading-normal">10</td>
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-240 h-[72px] px-4 py-2 w-[400px] text-[#94c7b6] text-sm font-normal leading-normal">18</td>
-                    </tr>
-                    <tr class="border-t border-t-[#356454]">
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-120 h-[72px] px-4 py-2 w-[400px] text-white text-sm font-normal leading-normal">11</td>
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-240 h-[72px] px-4 py-2 w-[400px] text-[#94c7b6] text-sm font-normal leading-normal">12</td>
-                    </tr>
-                    <tr class="border-t border-t-[#356454]">
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-120 h-[72px] px-4 py-2 w-[400px] text-white text-sm font-normal leading-normal">12</td>
-                      <td class="table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-240 h-[72px] px-4 py-2 w-[400px] text-[#94c7b6] text-sm font-normal leading-normal">8</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-              <style>
-                          @container(max-width:120px){.table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-120{display: none;}}
-                @container(max-width:240px){.table-2b3b92b3-8dc6-449b-9802-42de27612f97-column-240{display: none;}}
-              </style>
-            </div>
+              <div class="flex flex-col p-4">
+  <div class="rounded-lg border-2 border-dashed border-[#356454] px-6 py-8">
+
+    {% if gallery_images %}
+    <div class="w-full mb-6">
+      <p class="text-white mb-3 font-medium text-center">Current Gallery Images:</p>
+      <div class="flex flex-wrap justify-center gap-4">
+        {% for img in gallery_images %}
+          <img src="{{ img.image.url }}" class="w-32 h-32 object-cover rounded-lg border border-[#356454] shadow">
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="text-center">
+      <p class="text-white text-lg font-bold">Upload New Gallery Images</p>
+      <input type="file" name="gallery_images" multiple class="mt-4 text-white">
+    </div>
+
+  </div>
+</div>
+            </div>        
             <div class="flex justify-stretch">
               <div class="flex flex-1 gap-3 flex-wrap px-4 py-3 justify-end">
                 <button
                   class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#107f5a] text-white text-sm font-bold leading-normal tracking-[0.015em]"
                 >
-                  <span class="truncate">Update Product</span>
+                  <span class="truncate">Apply</span>
                 </button>
-                <button
-                  class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#25463b] text-white text-sm font-bold leading-normal tracking-[0.015em]"
-                >
-                  <span class="truncate">Cancel</span>
-                </button>
+                <a href="{% url 'products:product_list' %}"
+                class="flex min-w-[84px] items-center justify-center rounded-lg h-10 px-4 bg-[#25463b] text-white text-sm font-bold">
+                Cancel
+                </a>
               </div>
             </div>
+          </form>
           </div>
         </div>
       </div>
     </div>
+    <script src="https://unpkg.com/cropperjs"></script>
   </body>
 </html>

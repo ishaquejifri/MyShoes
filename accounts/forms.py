@@ -37,4 +37,4 @@ class AddressForm(forms.ModelForm):
             'state',
             'postal_code',
             'is_default'
-        ]    
+        ]      

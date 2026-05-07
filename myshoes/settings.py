@@ -15,8 +15,11 @@ from dotenv import load_dotenv
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(os.path.join(BASE_DIR,".env"))
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
@@ -42,6 +45,8 @@ INSTALLED_APPS = [
     'accounts',
     'adminpanel',
     'category',
+    'products',
+    'cart',
     'django.contrib.sites',
     'allauth',
     'allauth.account',    
@@ -156,11 +161,11 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = 'ishaque7jifri@gmail.com'
-EMAIL_HOST_PASSWORD = 'otwb yvlq pesv srjx'
+# EMAIL_HOST_USER = 'ishaque7jifri@gmail.com'
+# EMAIL_HOST_PASSWORD = 'otwb yvlq pesv srjx'
 
-# EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
-# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  
 
 AUTHENTICATION_BACKENDS = [
     

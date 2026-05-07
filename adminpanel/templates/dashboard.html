@@ -22,7 +22,7 @@
               <div class="flex flex-col gap-4">
                 <h1 class="text-white text-base font-medium leading-normal">Lotto Shoes</h1>
                 <div class="flex flex-col gap-2">
-                  <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#224939]">
+                  <a href="{% url 'admin_dashboard'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="House" data-size="24px" data-weight="fill">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -31,8 +31,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Dashboard</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="{% url 'products:product_list'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Boot" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -40,9 +40,9 @@
                         ></path>
                       </svg>
                     </div>
-                    <p class="text-white text-sm font-medium leading-normal">Products</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                    <p class="text-white text-sm font-medium leading-normal">Products</p>  
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="ListBullets" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -51,7 +51,7 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Orders</p>
-                  </div>
+                  </a>
                   <a href="{% url 'category_list' %}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                   
                     <div class="text-white" data-icon="Tag" data-size="24px" data-weight="regular">
@@ -72,7 +72,7 @@
         </div>
         <p class="text-white text-sm font-medium leading-normal">Users</p>
         </a>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="PresentationChart" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -81,8 +81,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Sales Report</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Image" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -91,8 +91,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Banners</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Ticket" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -101,8 +101,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Offers</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Tag" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -111,8 +111,8 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Coupons</p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Gear" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -121,7 +121,7 @@
                       </svg>
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Settings</p>
-                  </div>
+                  </a>
                 </div>
               </div>
               <form action="{% url 'admin_logout' %}" method="post">

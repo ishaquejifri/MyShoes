@@ -46,23 +46,17 @@
           </div>
           <div class="flex flex-1 justify-end gap-8">
             <div class="flex items-center gap-9">
-              <a class="text-[#0f161a] text-sm font-medium leading-normal" href="#">Formal</a>
-              <a class="text-[#0f161a] text-sm font-medium leading-normal" href="#">Casual</a>
-              <a class="text-[#0f161a] text-sm font-medium leading-normal" href="#">Running</a>
-              
+             {% for category in categories %}
+               <a
+                href="{% url 'user_product_list' %}?category={{ category.id }}"
+                class="text-[#121617] text-sm font-medium leading-normal"
+                >
+              {{ category.name }}
+              </a>
+               {% endfor %}
             </div>
             <div class="flex gap-2">
-              <button
-                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#e8eef2] text-[#0f161a] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
-              >
-                <div class="text-[#0f161a]" data-icon="MagnifyingGlass" data-size="20px" data-weight="regular">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                    <path
-                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
-                    ></path>
-                  </svg>
-                </div>                
-              </button>
+              
               <a href="{% url 'profile'%}">
               <button
                 class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#e8eef2] text-[#0f161a] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
@@ -120,62 +114,51 @@
             </div>
             <h2 class="text-[#0f161a] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Shop By Category</h2>
             <div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
-              <div class="flex flex-col gap-3 pb-3">
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAGRhJuRfJuNOvV1c78o77eqwhNjmJ0yyS4ACwi9d04xKV06yWjV16trk6XBL0Kh_gR-YW6G8CgKphGe41wIhP9vgzlGhG13v1lIaINYH2TUmYqu_l88r3FqYkfzxQe2UYT3IezD4L9v73SnoKbFBWlSlKxt_l7UrPpTnMh40ny-6OJe7fiFOKRr16oyDZHsXYZ7B_ew65pRZvJlDg6ji8fRm-T-cyP6IxuvMx0cpGS47dRxceRnVnsFxlvtTzopf9mHokpFUdWAY5S");'
-                ></div>
-                <p class="text-[#0f161a] text-base font-medium leading-normal">Formal</p>
-              </div>
-              <div class="flex flex-col gap-3 pb-3">
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA_LhecngS7Kf9tFtbKZznO-DytQjaxq8cq7gX8Uu0KDo9A2cZGTp4-7hAGFxJDCUOhUnIlJEfYDs5-t6rnxe9cpfRKxt5mLBi5n4Yti6TcjCrsjQa3zWvGGUc6JUT9_QBtjBhMbZ2kQsxGtZYd32lX8pWzooNbY2VxCBQNIui4AczZTmtGwbqC6g7bD4PUmJQcqwDyYffnKtlkKJqD-r9E7mK2_3yB4EM01iezaQ3enCRb3Wd9g5df_VZs-G04APPTaLRjdHZr3BV5");'
-                ></div>
-                <p class="text-[#0f161a] text-base font-medium leading-normal">Casual</p>
-              </div>
-              <div class="flex flex-col gap-3 pb-3">
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg"
-                  style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBpytXAdeQRucGhSEhi7aaOQl8ueafe-GSsj1XCA9shMvAKu4SEruvx8i4vmri9-BQ0Qvy6Gp9ZvsBauSKlOprdXJtJ6gWmNs0eYp2Mm5J6WsQm5QfZ60jpwlHvKO_ANfAZ5x5YhDrPtZHZmzKm_ctZzR9pGx8rHairVTh0lOGH_oFXh5tFwKu91ZTI1o7ScYyRDpVCSdGzEqtEcO9DZBi8rKAuVW8-3axlXurz-S9TAZsW-uoy6U8ugwURqUvj8oWF9v-337Ep5OSD");'
-                ></div>
-                <p class="text-[#0f161a] text-base font-medium leading-normal">Running</p>
-              </div>
-            </div>
+              {% for category in categories %}
+                <a href="{% url 'user_product_list' %}?category={{ category.id }}">
+                  <div class="flex flex-col gap-3 pb-3">
+        
+                  <div class="w-full aspect-video rounded-lg overflow-hidden">
+                  {% if category.image %}
+                  <img src="{{ category.image.url }}" class="w-full h-full object-cover">
+                  {% else %}
+                 <div class="w-full h-full bg-gray-200"></div>
+                  {% endif %}
+                </div>
+
+                  <p class="text-[#0f161a] text-base font-medium">
+                  {{ category.name }}
+                  </p>
+
+                </div>
+                </a>
+                {% endfor %}
+                </div>
             <h2 class="text-[#0f161a] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">New Arrivals</h2>
-            <div class="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
-              <div class="flex items-stretch p-4 gap-3">
-                <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-60">
-                  <div
-                    class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg flex flex-col"
-                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD2altEExCX-xmPpLNnV3z6kRZC5f_8r4G3IntQEZ5JKQPbVDhHqvFzBXShTxz2xRRuPs1eW5OdPCWGCocejQ_8wupvwPTHIuoU51pA6JBOo9U-lqbk1njkAd6f-wB6omhroW8aVx1JWGGu2aJ30Z_uRkvD2YQMqY5XfCOqfRHbge46-5gJIkOP9vO7p_8_tMkGoYEuEKm5rmdNJuIXtEuWm-F73AXwHormNWXmKhLamX9AJB54O5xAJE_Htt7Yr-WJVhvHOl70tGvY");'
-                  ></div>
-                  <div>
-                    <p class="text-[#0f161a] text-base font-medium leading-normal">Classic Oxfords</p>
-                    <p class="text-[#547992] text-sm font-normal leading-normal">Timeless elegance for the modern man.</p>
-                  </div>
+            <div class="flex overflow-x-auto gap-4 p-4">
+              {% for product in products %}
+              <a href="{% url 'user_product_details' product.id %}">
+            <div class="flex flex-col gap-3 min-w-[200px]">
+      
+              <div class="w-full h-40 rounded-lg overflow-hidden">
+                {% if product.image %}
+                <img src="{{ product.image.url }}" class="w-full h-full object-cover">
+                {% else %}
+                <div class="w-full h-full bg-gray-200"></div>
+                  {% endif %}
+                 </div>
+
+              <div>
+                <p class="text-[#0f161a] font-medium">
+                 {{ product.product_name }}
+                </p>
+                <p class="text-sm text-gray-500">
+                ₹{{ product.base_price }}
+                </p>
                 </div>
-                <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-60">
-                  <div
-                    class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg flex flex-col"
-                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCrzYwbcVWCzMdU1Rkbu-WFhCOtZm7PEKqeSAY5tOPmF6DjiwcxdTo0NU2jWiLogthI_S5C7UyjWPZvlMN4yHdsXttrd6gCRispTjnapqa45pmuaiMHM0WwiXbf_axcOHxX4fSK0G3I4nG6PrxCqnAGYWlch-KSAeB1cVxlUZLUF5VfObHINQ0L5c18sac73iJCbv8O2IKzbwrHEu9W3SRUoVRYPG1gN040DHcg5UniLvCp51EupdWKAliL1pDEOy-PEqbTDZgd7np6");'
-                  ></div>
-                  <div>
-                    <p class="text-[#0f161a] text-base font-medium leading-normal">Urban Sneakers</p>
-                    <p class="text-[#547992] text-sm font-normal leading-normal">Street-ready style for everyday wear.</p>
-                  </div>
-                </div>
-                <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-60">
-                  <div
-                    class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-lg flex flex-col"
-                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAtphLKzpn39MbT1pS8PI4QxTQ79bBN9LHFRO5zx96FTygJa65CXy4s-KPFguBcqBamGU5X1cdBvv_-5jSUgtShP19zytB_0Dluu1KdBdODbvtuyXOb4Tt43WpHE5BoESnxKFsnD2WopsoQOHt6-C6inUv8-Y-gh1ivWPywHx-_YcLR85g1NyZQ4sqKdblAJd5k-A8ZbUSmTalke-0eaL5tx3GGUss3OgftESEjslD41e-F-SlfX_Y1c32cCRm6DwEEvRfEqn97F8oM");'
-                  ></div>
-                  <div>
-                    <p class="text-[#0f161a] text-base font-medium leading-normal">Performance Runners</p>
-                    <p class="text-[#547992] text-sm font-normal leading-normal">Engineered for peak performance.</p>
-                  </div>
-                </div>
+
               </div>
+                {% endfor %}
             </div>
             <h2 class="text-[#0f161a] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Featured Styles</h2>
             <div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
@@ -265,7 +248,7 @@
                   </div>
                 </a>
               </div>
-              <p class="text-[#547992] text-base font-normal leading-normal">@2026 Lotto Shoes. All rights reserved.</p>
+              <p class="text-[#547992] text-sm font-normal leading-normal">@2026 Lotto Shoes. All rights reserved.</p>
             </footer>
           </div>
         </footer>

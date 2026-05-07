@@ -11,7 +11,7 @@
     <title>User List</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
 
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>  
   </head>
   <body>
     <div
@@ -28,8 +28,9 @@
                 <h1 class="text-white text-base font-medium leading-normal">
                   Lotto Shoes
                 </h1>
+                <a href="{% url 'admin_dashboard'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                 <div class="flex flex-col gap-2">
-                  <div class="flex items-center gap-3 px-3 py-2">
+                 
                     <div
                       class="text-white"
                       data-icon="House"
@@ -51,8 +52,8 @@
                     <p class="text-white text-sm font-medium leading-normal">
                       Dashboard
                     </p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="{% url 'products:product_list'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div
                       class="text-white"
                       data-icon="Package"
@@ -74,8 +75,8 @@
                     <p class="text-white text-sm font-medium leading-normal">
                       Products
                     </p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div
                       class="text-white"
                       data-icon="ListBullets"
@@ -97,8 +98,9 @@
                     <p class="text-white text-sm font-medium leading-normal">
                       Orders
                     </p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="{% url 'category_list'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
+                  
                     <div
                       class="text-white"
                       data-icon="Tag"
@@ -120,10 +122,9 @@
                     <p class="text-white text-sm font-medium leading-normal">
                       Categories
                     </p>
-                  </div>
-                  <div
-                    class="flex items-center gap-3 px-3 py-2 rounded-lg bg-[#204b39]"
-                  >
+                  
+                </a>
+                  <a href="{% url 'user_list'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div
                       class="text-white"
                       data-icon="Users"
@@ -145,8 +146,8 @@
                     <p class="text-white text-sm font-medium leading-normal">
                       Users
                     </p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div
                       class="text-white"
                       data-icon="PresentationChart"
@@ -168,8 +169,8 @@
                     <p class="text-white text-sm font-medium leading-normal">
                       Sales Report
                     </p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div
                       class="text-white"
                       data-icon="Image"
@@ -191,8 +192,8 @@
                     <p class="text-white text-sm font-medium leading-normal">
                       Banners
                     </p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div
                       class="text-white"
                       data-icon="Percent"
@@ -214,8 +215,8 @@
                     <p class="text-white text-sm font-medium leading-normal">
                       Offers
                     </p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div
                       class="text-white"
                       data-icon="Ticket"
@@ -237,8 +238,8 @@
                     <p class="text-white text-sm font-medium leading-normal">
                       Coupons
                     </p>
-                  </div>
-                  <div class="flex items-center gap-3 px-3 py-2">
+                  </a>
+                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div
                       class="text-white"
                       data-icon="Gear"
@@ -260,7 +261,7 @@
                     <p class="text-white text-sm font-medium leading-normal">
                       Settings
                     </p>
-                  </div>
+                  </a>
                 </div>
               </div>
               <form action="{% url 'admin_logout' %}" method="post">

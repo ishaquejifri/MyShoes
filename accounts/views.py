@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.core.mail import send_mail
 from django.utils import timezone
 from django.conf import settings
+from products.models import Category
 
 
 
@@ -158,7 +159,7 @@ def user_login(request):
             # return redirect('home')
             return redirect('home')
         else:
-            messages.error(request,'invalid email or password')
+            messages.error(request,'invalid email or password')  
        
     return render(request,'login.html')        
 
@@ -168,11 +169,14 @@ def logout_view(request):
     return redirect('home')
 
 def home(request):
+    categories = Category.objects.filter(is_active=True)
 
     if request.session.pop('just_logged_in',False):
         messages.success(request,'You are logged in successfully')
 
-    return render(request, "home.html")   
+    return render(request, "home.html",{
+        'categories': categories,
+    })     
 
         
     
@@ -244,6 +248,7 @@ def new_password(request):
 def profile(request):
 
     addresses = Address.objects.filter(user=request.user)
+    categories = Category.objects.filter(is_active=True)  
 
     if request.method == 'POST':
         image = request.FILES.get('profile_image')
@@ -257,7 +262,10 @@ def profile(request):
 
         return redirect('profile')
         
-    return render(request,'accounts/profile.html',{'addresses':addresses})
+    return render(request,'accounts/profile.html',{
+        'addresses': addresses,
+        'categories': categories,
+        })
 
 @login_required(login_url='login')
 @never_cache
@@ -266,10 +274,10 @@ def edit_profile(request):
     user = request.user
 
     if request.method == 'POST':
-        user.first_name = request.POST.get('first_name')
-        user.last_name = request.POST.get('last_name')
-        user.email = request.POST.get('email')
-        user.phone = request.POST.get('phone')
+        user.first_name = request.POST.get('first_name',user.first_name)
+        user.last_name = request.POST.get('last_name',user.last_name)
+        user.email = request.POST.get('email',user.email)
+        user.phone = request.POST.get('phone',user.phone)  
 
         if request.FILES.get('profile_image'):
             user.profile_image = request.FILES.get('profile_image')

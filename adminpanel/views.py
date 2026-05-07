@@ -38,7 +38,11 @@ def admin_login(request):
 
 # @admin_required
 def admin_logout(request):
+    storage = messages.get_messages(request)
+    for _ in storage:
+        pass
     logout(request)
+    request.session.flush()
     return redirect('admin_login')
 
 # @admin_required
@@ -49,7 +53,8 @@ def admin_dashboard(request):
     
     return render(request, "dashboard.html")
 
-# @admin_required
+@never_cache
+@login_required(login_url='admin_login')
 def user_list(request):
 
     search_query = request.GET.get('search','')
@@ -80,6 +85,7 @@ def admin_sales_report(request):
 
     return render(request,'sales_report.html') 
 
+@login_required(login_url='admin_login')
 def toggle_block_user(request, user_id):
     user = get_object_or_404(User,id=user_id)
 
