@@ -166,13 +166,14 @@
                     class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16"
                     style="background-image: url('{{ item.product.image.url }}');"
                   ></div>
-
+                    
                   <div class="flex flex-col justify-center">
                     <p
                       class="text-[#0d191b] text-base font-medium leading-normal"
                     >
                       Name: {{ item.product.product_name }}
                     </p>
+                    
                     <p
                       class="text-[#4c8d9a] text-sm font-normal leading-normal"
                     >
@@ -185,6 +186,8 @@
                       Subtotal: ₹<span id="subtotal-{{ item.id }}">{{ item.subtotal }}</span>
                     </p>
                   </div>
+                  <p>Size: {{ item.variant.size }}</p>
+                    <p>Color: {{ item.variant.color }}</p>
                 </div>
 
                 <!-- Quantity Controls -->

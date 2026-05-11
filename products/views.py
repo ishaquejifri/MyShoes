@@ -151,14 +151,20 @@ def product_details(request,id):
     product = get_object_or_404(Product,id=id)
     variants = product.variants.all()
 
+    sizes = variants.value_list('size', flat=True).distinct()
+    colors = variants.value_list('color', flat=True).distinct()
+
 
     return render(request,'product_details.html', { 
          'product': product,
-         'variants': variants
-                                                    })
+         'variants': variants,
+         'colors': colors,
+         'sizes': sizes,
+
+         })
 
 @never_cache
-@login_required(login_url='admin_login')
+@login_required(login_url='admin_login') 
 def add_variant(request,product_id):
      
      product = get_object_or_404(Product,id=product_id)

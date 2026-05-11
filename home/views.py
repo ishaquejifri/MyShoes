@@ -75,8 +75,11 @@ def user_product_details(request,pk):
     categories = Category.objects.filter(is_active=True)
     product = Product.objects.get(pk=pk)
 
-    print(product.product_name, product.is_available, product.is_blocked, product.stock)
+    variants = product.variants.all()
 
+    sizes = variants.values_list('size', flat=True).distinct()
+    colors = variants.values_list('color', flat=True).distinct()
+        
     related_products = Product.objects.filter(
         category = product.category,
         is_listed=True
@@ -90,6 +93,8 @@ def user_product_details(request,pk):
         'product': product,
         'related_products': related_products,
         'categories': categories,
+        'sizes': sizes,
+        'colors': colors,
     })
 
 
