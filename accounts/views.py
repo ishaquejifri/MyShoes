@@ -310,7 +310,7 @@ def change_password(request):
             messages.error(request,'New password cannot be same as old password')
             return redirect('change_password')     
         
-        user.set_password(new_password)
+        user.set_password(new_password) 
         user.save()
 
         messages.success(request,'Password changed successfully, Please login again')
@@ -388,8 +388,9 @@ def email_change_otp(request):
 def my_address(request):
 
     addresses = Address.objects.filter(user=request.user).order_by('-id')
+    categories = Category.objects.filter(is_active=True)
 
-    return render(request,'accounts/my_address.html',{'addresses': addresses})    
+    return render(request,'accounts/my_address.html',{'addresses': addresses, 'categories': categories})    
 
 @login_required(login_url='login')
 @never_cache

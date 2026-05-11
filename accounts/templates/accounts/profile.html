@@ -1,10 +1,32 @@
 {% if messages %}
-  {% for message in messages %}
-    <div class="bg-green-100 text-green-800 px-4 py-2 m-2 rounded">
-      {{ message }}
-    </div>
-  {% endfor %}
-{% endif %}
+              <div id="message-box" class="max-w-md mx-auto mt-4">
+                {% for message in messages %}
+      
+                  {% if message.tags == 'error' %}
+                  <div class="mb-3 px-4 py-3 rounded-md text-sm bg-red-100 text-red-700 border border-red-300">
+                  {{ message }}
+                  </div>
+
+                  {% elif message.tags == 'warning' %}
+                  <div class="mb-3 px-4 py-3 rounded-md text-sm bg-yellow-100 text-yellow-800 border border-yellow-300">
+                  {{ message }}
+                  </div>
+
+                  {% elif message.tags == 'success' %}
+                  <div class="mb-3 px-4 py-3 rounded-md text-sm bg-green-100 text-green-700 border border-green-300">
+                  {{ message }}
+                  </div>
+
+                  {% else %}
+                 <div class="mb-3 px-4 py-3 rounded-md text-sm bg-gray-100 text-gray-700 border border-gray-300">
+                 {{ message }}
+                 </div>
+      
+                 {% endif %}
+
+                {% endfor %}
+               </div>
+              {% endif %}
 
 <html>
   <head>
@@ -548,5 +570,15 @@
         </footer>
       </div>
     </div>
+        
+    <script>
+      setTimeout(function () {
+        const messageBox = document.getElementById("message-box");
+        if (messageBox) {
+          messageBox.style.display = "none";
+        }
+      }, 3000); // 3000ms = 3 seconds
+    </script>
+
   </body>
 </html>

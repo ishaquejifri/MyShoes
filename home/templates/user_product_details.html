@@ -8,7 +8,7 @@
       href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Serif%3Awght%40400%3B500%3B700%3B900&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
     />
 
-    <title>{{product.product_name}}</title>
+    <title>{{product.product_name}}</title> 
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -51,6 +51,7 @@
               
             </div>
             <div class="flex gap-2">
+              <a href="{% url 'wishlist' %}">Wishlist</a>
              
               <a href="{% url 'profile'%}">
               <button
@@ -350,85 +351,59 @@
             </p>
             <h3 class="text-[#131416] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Size</h3>
             <div class="flex flex-wrap gap-3 p-4">
+              {% for size in sizes %}
               <label
-                class="text-sm font-medium leading-normal flex items-center justify-center rounded-lg border border-[#d9dbdd] px-4 h-11 text-[#131416] has-[:checked]:border-[3px] has-[:checked]:px-3.5 has-[:checked]:border-[#21262c] relative cursor-pointer"
-              >
-                7
-                <input type="radio" class="invisible absolute" name="688ca26d-2b3f-49ef-be2f-fa2f9b64adc7" />
+                class="text-sm font-medium leading-normal flex items-center justify-center rounded-lg border border-[#d9dbdd]
+                  px-4 h-11 text-[#131416]
+                  has-[:checked]:border-[3px]
+                  has-[:checked]:px-3.5
+                  has-[:checked]:border-[#21262c]
+                  relative cursor-pointer"
+>
+                {{ size }}
+
+              <input
+                    type="radio"
+                    name="size"   
+                    value="{{ size }}"
+                    class="invisible absolute"
+                >
               </label>
-              <label
-                class="text-sm font-medium leading-normal flex items-center justify-center rounded-lg border border-[#d9dbdd] px-4 h-11 text-[#131416] has-[:checked]:border-[3px] has-[:checked]:px-3.5 has-[:checked]:border-[#21262c] relative cursor-pointer"
-              >
-                8
-                <input type="radio" class="invisible absolute" name="688ca26d-2b3f-49ef-be2f-fa2f9b64adc7" />
-              </label>
-              <label
-                class="text-sm font-medium leading-normal flex items-center justify-center rounded-lg border border-[#d9dbdd] px-4 h-11 text-[#131416] has-[:checked]:border-[3px] has-[:checked]:px-3.5 has-[:checked]:border-[#21262c] relative cursor-pointer"
-              >
-                9
-                <input type="radio" class="invisible absolute" name="688ca26d-2b3f-49ef-be2f-fa2f9b64adc7" />
-              </label>
-              <label
-                class="text-sm font-medium leading-normal flex items-center justify-center rounded-lg border border-[#d9dbdd] px-4 h-11 text-[#131416] has-[:checked]:border-[3px] has-[:checked]:px-3.5 has-[:checked]:border-[#21262c] relative cursor-pointer"
-              >
-                10
-                <input type="radio" class="invisible absolute" name="688ca26d-2b3f-49ef-be2f-fa2f9b64adc7" />
-              </label>
-              <label
-                class="text-sm font-medium leading-normal flex items-center justify-center rounded-lg border border-[#d9dbdd] px-4 h-11 text-[#131416] has-[:checked]:border-[3px] has-[:checked]:px-3.5 has-[:checked]:border-[#21262c] relative cursor-pointer"
-              >
-                11
-                <input type="radio" class="invisible absolute" name="688ca26d-2b3f-49ef-be2f-fa2f9b64adc7" />
-              </label>
-              <label
-                class="text-sm font-medium leading-normal flex items-center justify-center rounded-lg border border-[#d9dbdd] px-4 h-11 text-[#131416] has-[:checked]:border-[3px] has-[:checked]:px-3.5 has-[:checked]:border-[#21262c] relative cursor-pointer"
-              >
-                12
-                <input type="radio" class="invisible absolute" name="688ca26d-2b3f-49ef-be2f-fa2f9b64adc7" />
-              </label>
+              {% endfor %}
             </div>
             <h3 class="text-[#131416] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Color</h3>
             <div class="flex flex-wrap gap-5 p-4">
+              {% for color in colors %}
               <label
-                class="size-10 rounded-full border border-[#d9dbdd] ring-[color-mix(in_srgb,#131416_50%,_transparent)] has-[:checked]:border-[3px] has-[:checked]:border-neutral-50 has-[:checked]:ring"
-                style="background-color: rgb(0, 0, 0);"
+                  class="px-4 py-2 rounded-lg border cursor-pointer
+                  has-[:checked]:border-[3px]
+                  has-[:checked]:border-black"
               >
-                <input type="radio" class="invisible" name="50c887b1-ea96-4609-a776-d7b44fd743d6" />
+                  {{ color }}
+
+              <input
+                  type="radio"
+                  name="color"
+                  value="{{ color }}"
+                  class="hidden"
+              >
               </label>
-              <label
-                class="size-10 rounded-full border border-[#d9dbdd] ring-[color-mix(in_srgb,#131416_50%,_transparent)] has-[:checked]:border-[3px] has-[:checked]:border-neutral-50 has-[:checked]:ring"
-                style="background-color: rgb(160, 82, 45);"
-              >
-                <input type="radio" class="invisible" name="50c887b1-ea96-4609-a776-d7b44fd743d6" />
-              </label>
-              <label
-                class="size-10 rounded-full border border-[#d9dbdd] ring-[color-mix(in_srgb,#131416_50%,_transparent)] has-[:checked]:border-[3px] has-[:checked]:border-neutral-50 has-[:checked]:ring"
-                style="background-color: rgb(210, 180, 140);"
-              >
-                <input type="radio" class="invisible" name="50c887b1-ea96-4609-a776-d7b44fd743d6" />
-              </label>
-              <label
-                class="size-10 rounded-full border border-[#d9dbdd] ring-[color-mix(in_srgb,#131416_50%,_transparent)] has-[:checked]:border-[3px] has-[:checked]:border-neutral-50 has-[:checked]:ring"
-                style="background-color: rgb(43, 12, 243);"
-              >
-                <input type="radio" class="invisible" name="50c887b1-ea96-4609-a776-d7b44fd743d6" />
-              </label>
-              <label
-                class="size-10 rounded-full border border-[#d9dbdd] ring-[color-mix(in_srgb,#131416_50%,_transparent)] has-[:checked]:border-[3px] has-[:checked]:border-neutral-50 has-[:checked]:ring"
-                style="background-color: rgb(171, 167, 164);"
-              >
-                <input type="radio" class="invisible" name="50c887b1-ea96-4609-a776-d7b44fd743d6" />  
-              </label>  
+                {% endfor %} 
             </div>
             
             <div class="flex px-4 py-3">
                {% if product.stock > 0 and product.is_available and not product.is_blocked and product.category.is_active %}
-                <a href="{% url 'cart:add_to_cart' product.id %}">
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 flex-1 bg-[#21262c] text-neutral-50 text-sm font-bold leading-normal tracking-[0.015em]">
-                <span>Add to Cart</span>
-              </button>
-                </a>
+               <form method="POST" action="{% url 'cart:add_to_cart' product.id %}" onsubmit="return validateVariant()">
+                {% csrf_token %}
+
+                <input type="hidden" name="variant_id" id="selectedVariant">
+
+                <button
+                    type="submit"
+                    class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 flex-1 bg-[#21262c] text-neutral-50 text-sm font-bold leading-normal tracking-[0.015em]">
+                    <span>Add to Cart</span>
+                </button>
+                </form>
               {% else %}
                 <button disabled
                   class="flex min-w-[84px] max-w-[480px] items-center justify-center overflow-hidden rounded-lg h-10 px-4 flex-1 bg-gray-400 text-white text-sm font-bold cursor-not-allowed">
@@ -437,11 +412,13 @@
                     {% endif %}
               </div>
             <div class="flex px-4 py-3">
+              <a href="{% url 'add_to_wishlist' product.id %}">
               <button
                 class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 flex-1 bg-[#21262c] text-neutral-50 text-sm font-bold leading-normal tracking-[0.015em]"
               >
-                <span class="truncate">Add to Wishlist</span>
+                <span class="truncate"> ❤️Add to Wishlist</span>
               </button>
+            </a>
             </div>
           </div>
         </div>
@@ -497,6 +474,69 @@
         mainImage.src = imageUrl;
         }
       </script>
+
+      <script>
+
+const variants = [
+    {% for variant in variants %}
+    {
+        id: "{{ variant.id }}",
+        size: "{{ variant.size }}",
+        color: "{{ variant.color }}",
+        stock: "{{ variant.stock }}"
+    },
+    {% endfor %}
+];
+
+let selectedSize = null;
+let selectedColor = null;
+
+document.querySelectorAll('input[name="size"]').forEach(input => {
+    input.addEventListener('change', function() {
+        selectedSize = this.value;
+        updateVariant();
+    });
+});
+
+document.querySelectorAll('input[name="color"]').forEach(input => {
+    input.addEventListener('change', function() {
+        selectedColor = this.value;
+        updateVariant();
+    });
+});
+
+function updateVariant() {
+
+    const matchedVariant = variants.find(v =>
+    v.size.trim() === selectedSize.trim() &&
+    v.color.trim() === selectedColor.trim()
+);
+
+    if (matchedVariant) {
+        document.getElementById('selectedVariant').value = matchedVariant.id;
+    }
+}
+
+</script>
+
+<script>
+function validateVariant() {
+
+    if (!selectedSize || !selectedColor) {
+        alert("Please select size and color");
+        return false;
+    }
+
+    const variantInput = document.getElementById('selectedVariant').value;
+
+    if (!variantInput) {
+        alert("Selected variant is unavailable");
+        return false;
+    }
+
+    return true;
+}
+</script>
 
   </body>
 </html>

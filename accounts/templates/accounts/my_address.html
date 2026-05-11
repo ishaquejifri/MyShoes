@@ -42,23 +42,17 @@
           </div>
           <div class="flex flex-1 justify-end gap-8">
             <div class="flex items-center gap-9">
-              <a class="text-[#101819] text-sm font-medium leading-normal" href="#">Formal</a>
-              <a class="text-[#101819] text-sm font-medium leading-normal" href="#">Casual</a>
-              <a class="text-[#101819] text-sm font-medium leading-normal" href="#">Running</a>
-              
+              {% for category in categories %}
+               <a
+                href="{% url 'user_product_list' %}?category={{ category.id }}"
+                class="text-[#121617] text-sm font-medium leading-normal"
+                >
+              {{ category.name }}
+              </a>
+               {% endfor %}
             </div>
-            <div class="flex gap-2">
-              <button
-                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#e9f0f1] text-[#101819] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
-              >
-                <div class="text-[#101819]" data-icon="MagnifyingGlass" data-size="20px" data-weight="regular">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                    <path
-                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
-                    ></path>
-                  </svg>
-                </div>
-              </button>
+            <div class="flex gap-2"> 
+              
               <a href="{% url 'profile'%}">
               <button
                 class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#e9f0f1] text-[#101819] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"

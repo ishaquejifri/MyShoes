@@ -5,6 +5,8 @@ from .models import Cart,CartItem
 from django.http import JsonResponse
 from django.contrib import messages
 from category.models import Category
+from products.models import ProductVariant
+from wishlist.models import Wishlist
 
 
 # Create your views here.
@@ -13,38 +15,68 @@ from category.models import Category
 def add_to_cart(request,product_id):
     if not request.user.is_authenticated:
         messages.warning(request,"⚠️ Please Login to purchase the Product")
-        return redirect(f'/user/login/?next=/cart/add/{id}/')
+        return redirect(f'/user/login/?next=/cart/add/{product_id}/')
 
     product = get_object_or_404(Product,id=product_id)
 
+    variant_id = request.POST.get('variant_id')
     
-    if product.stock <= 0 or not product.is_available or product.is_blocked:
+    if not variant_id:
+        messages.error(request,'Please select size and color.')
+        return redirect('wishlist')
+
+    variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
+
+    # Product availability check
+    if not product.is_available or product.is_blocked:
         messages.error(request, "This product is unavailable.")
         return redirect('user_product_list')
+    
+    # Variant stock check
+    if variant.stock <= 0:
+        messages.error(request,'Selected variant is out of stock.')
+        return redirect('wishlist')
 
     cart, created = Cart.objects.get_or_create(user=request.user)
 
     cart_item, item_created = CartItem.objects.get_or_create(
         cart=cart,
         product=product,
+        variant=variant,
         defaults={
             'quantity': 1,
-            'price': product.base_price
+            'price': product.base_price or product.offer_price
                   })
 
-    
+    #already exists in cart
     if not item_created:
+        
+        #max quantity check
+        if cart_item.quantity >= CartItem.MAX_QUANTITY_PER_PRODUCT:
+            messages.error(request,'Maximum quantity reached.')
+            return redirect('cart:view_cart')
+        
+        #variant stock limit check
+        if cart_item.quantity >= variant.stock:
+            messages.error(request,'NO More stock available.')
+            return redirect('cart:view_cart')
         cart_item.quantity += 1
         cart_item.save()
-        messages.success(request, "Quantity increased in cart.")
-    else:
-        messages.error(request, "No more stock available.")
 
-    return redirect('cart:view_cart') 
+        messages.success(request,'Quantity increased in cart')
+    else:
+        messages.success(request,'Product added to the cart') 
+
+    #remove from wishlist
+    if request.GET.get('from_wishlist') == 'true':
+        Wishlist.objects.filter(user=request.user,product=product).delete()    
+
+    return redirect('cart:view_cart')       
+
 
 @login_required
 def view_cart(request):
-    categories = Category.objects.filter(is_active=True)
+    categories = Category.objects.filter(is_active=True)  
     cart, created = Cart.objects.get_or_create(user = request.user)
     cart_items = cart.items.all()
 
