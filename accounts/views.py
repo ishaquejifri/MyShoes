@@ -7,10 +7,13 @@ from django.core.mail import send_mail
 from .models import CustomUser,Address
 from .forms import SignupForm, LoginForm,AddressForm
 from django.contrib import messages
-from django.core.mail import send_mail
 from django.utils import timezone
 from django.conf import settings
 from products.models import Category
+import re
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+
 
 
 
@@ -25,27 +28,98 @@ def signup(request):
         email = request.POST.get('email')
         phone = request.POST.get('phone')
         password = request.POST.get('password')
-        confirm_password = request.POST.get('confirm_password')
+        confirm_password = request.POST.get('confirm_password') 
 
-        if not first_name or not last_name or not email or not phone or not password or not confirm_password:
+        # Empty field validation
+        if not all([first_name,last_name,email,phone,password,confirm_password]):
             messages.error(request,'Every Field Should be Filled')
             return redirect('signup')
-
-        if password != confirm_password:
-            messages.error(request,'Password does not match')
+        
+        # First Name Validation
+        if len(first_name) < 3 or len(first_name) > 15:
+            messages.error(request, 'First name must be between 3 and 15 characters.')
             return redirect('signup')
+        
+        if not re.fullmatch(r'^[A-Za-z ]+$', first_name):
+            messages.error(request, 'First name should contain only letters and space.')
+            return redirect('signup')
+        
+        # Last Name Validation
+        if len(last_name) < 3 or len(last_name) > 15:
+            messages.error(request, 'Last name must be between 3 and 15 characters.')
+            return redirect('signup')
+        
+        if not re.fullmatch(r'^[A-Za-z ]+$', last_name):
+            messages.error(request, 'Last name should contain only letters and space.')
+
+        # Email validation
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, 'Please enter a valid email address.')
+            return redirect('signup')    
 
         if User.objects.filter(email=email).exists():
             messages.error(request,'Email already registered')
             return redirect('signup')
         
+        # phone validation
+        digits_only = re.sub(r'\D','', phone)
+
+        if not digits_only.isdigit():
+            messages.error(request, 'Phone number should contain digits only.')
+            return redirect('signup')
+        
+        if len(digits_only) != 10:
+            messages.error(request, 'Phone number must be exactly 10 digits.')
+            return redirect('signup')
+
+        sequential_patterns = ['1234567890','0123456789','9876543210','0987654321']  
+
+        if digits_only in sequential_patterns:
+            messages.error(request, 'Enter a valid phone number.')
+            return redirect('signup')
+
+        # check repeated digts like 11111111
+        if len(set(digits_only)) == 1:
+            messages.error(request, 'Enter a valid phone number.')
+            return redirect('signup')
+        
+        # phone already exists
+        if User.objects.filter(phone=digits_only).exists():
+            messages.error(request, 'The phone number is already registered.')
+            return redirect('signup')
+        
+        # password validation
+        if len(password) < 8:
+            messages.error(request, 'Password must be at least 8 characters long.')
+            return redirect('signup')
+        
+        # if not re.search(r'[a-z]', password):
+        #     messages.error(request, 'Password must contain at least one lowercase letter.')
+        #     return redirect('signup')
+        # if not re.search(r'[A-Z]', password):
+        #     messages.error(request, 'Password must contain at least one uppercase letter.')
+        #     return redirect('signup')
+        # if not re.search(r'[0-9]', password):   
+        #     messages.error(request, 'Password must contain at least one number.')
+        #     return redirect('signup')
+        # if not re.search(r'[@$%&*!?]', password):
+        #     messages.error(request, 'Password must contain at least one special character.')
+        #     return redirect('signup')
+        
+        # confirm password check
+        if password != confirm_password:
+            messages.error(request, 'Password does not match')
+            return redirect('signup')
+
         otp = generate_otp()
 
         request.session['signup_data'] = {
             'first_name': first_name,
             'last_name': last_name,
             'email': email,
-            'phone': phone,
+            'phone': digits_only,
             'password': password,
             'otp': otp
         }
@@ -395,6 +469,9 @@ def my_address(request):
 @login_required(login_url='login')
 @never_cache
 def add_address(request):
+
+    next_url = request.GET.get('next') or request.POST.get('next')
+
     if request.method == "POST":
         form = AddressForm(request.POST)
         if form.is_valid():
@@ -402,21 +479,27 @@ def add_address(request):
             address.user = request.user
 
             if address.is_default:
-                Address.objects.filter(user=request.user,is_default=True).update(is_default=False)
+                Address.objects.filter(user=request.user).update(is_default=False)
 
             if not Address.objects.filter(user=request.user).exists():
                 address.is_default=True    
 
             address.save()
             messages.success(request,'Address added successfully')
+
+            if next_url == 'checkout':
+                return redirect('checkout')
+
             return redirect('my_address')
     else:
         form = AddressForm()
-        print(form.errors)
+        
 
-    return render(request,'accounts/add_address.html',{'form': form})
+    return render(request,'accounts/add_address.html',{'form': form, 'next': next_url})
 
 def edit_address(request,id):
+
+    next_url = request.GET.get('next') or request.POST.get('next')
     address = get_object_or_404(Address,id=id,user=request.user)
 
     if request.method == "POST":
@@ -424,29 +507,57 @@ def edit_address(request,id):
         if form.is_valid():
 
             if not form.has_changed():
+                messages.info(request, 'No changes detected')
                 return redirect('my_address')
             
-            address = form.save(commit=False)
+            updated_address = form.save(commit=False)
 
-            if address.is_default:
-                Address.objects.filter(user = request.user).update(is_default = False)
+            if updated_address.is_default:
+                Address.objects.filter(user = request.user).exclude(id=address.id).update(is_default = False)
 
-            address.save()
+            updated_address.save()
+
             messages.success(request,'Address updated successfully')
-            return redirect('my_address')    
+            if next_url == 'checkout':
+                return redirect('checkout')
+            return redirect('my_address')
+
+        else:
+            messages.error(request, 'Failed to update the address. Please check the form.')    
     else:
-        messages.error(request,'Failed to update address. Please check the form')
         form = AddressForm(instance=address)
 
 
     return render(request,'accounts/edit_address.html',{
         'form': form,
-        'address':address
+        'address':address,
+        'next': next_url
         })  
   
-def delete_address(request,id):
-    address = get_object_or_404(Address,id=id,user = request.user)
+
+def delete_address(request, id):
+
+    if request.method != "POST":
+        return redirect('my_address')
+
+    next_url = request.POST.get('next')
+
+    address = get_object_or_404(
+        Address,
+        id=id,
+        user=request.user
+    )
+
+    # Prevent deleting default address (optional)
+    if address.is_default:
+        messages.error(request, 'Default address cannot be deleted')
+        return redirect('my_address')
+
     address.delete()
 
-    messages.success(request,'Address Deleted Successfully')
+    messages.success(request, 'Address Deleted Successfully')
+
+    if next_url == 'checkout':
+        return redirect('checkout')
+
     return redirect('my_address')

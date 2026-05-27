@@ -44,7 +44,22 @@
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Products</p>
                   </a>
-                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
+                  <a href="{% url 'inventory_management' %}" 
+                  class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
+                  <div class="text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        width="24px"
+                        height="24px"
+                        fill="currentColor"
+                        viewBox="0 0 256 256">
+                      <path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48ZM96,176H48V80H96Zm112,0H112V80h96Z"></path>
+                      </svg>
+                  </div>
+                  <p class="text-white text-sm font-medium leading-normal">
+                    Inventory
+                  </p>
+                </a>
+                  <a href="{% url 'admin_order_list'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="ListBullets" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -151,7 +166,7 @@
             </div>
 
                   {% if messages %}
-                <div class="max-w-2xl mx-auto mt-4">
+                <div id="message-box" class="max-w-2xl mx-auto mt-4">
                   {% for message in messages %}
       
                     {% if message.tags == 'success' %}
@@ -311,6 +326,26 @@
         </div>
       </div>
     </div>
+
+    <script>
+  setTimeout(function () {
+    const messageBox = document.getElementById('message-box');
+
+    if (messageBox) {
+
+      // Smooth fade out
+      messageBox.style.transition = "opacity 0.5s ease";
+
+      messageBox.style.opacity = "0";
+
+      // Remove completely after fade
+      setTimeout(() => {
+        messageBox.style.display = "none";
+      }, 500);
+    }
+
+  }, 5000); // 5 seconds
+</script>
    
     <script>
   const input = document.getElementById("searchInput");

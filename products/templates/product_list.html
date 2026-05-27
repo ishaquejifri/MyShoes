@@ -44,7 +44,22 @@
                     </div>
                     <p class="text-white text-sm font-medium leading-normal">Products</p>
                   </a>
-                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
+                  <a href="{% url 'inventory_management' %}" 
+                  class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
+                  <div class="text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        width="24px"
+                        height="24px"
+                        fill="currentColor"
+                        viewBox="0 0 256 256">
+                      <path d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48ZM96,176H48V80H96Zm112,0H112V80h96Z"></path>
+                    </svg>
+                  </div>
+                  <p class="text-white text-sm font-medium leading-normal">
+                    Inventory
+                  </p>
+                </a>
+                  <a href="{% url 'admin_order_list'%}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div class="text-white" data-icon="Receipt" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
@@ -149,7 +164,7 @@
              </div>
 
                       {% if messages %}
-                    <div class="max-w-2xl mx-auto mt-4">
+                    <div id="message-box" class="max-w-2xl mx-auto mt-4">
                     {% for message in messages %}
       
                     {% if message.tags == 'success' %}
@@ -241,32 +256,40 @@
                     <tr class="border-t border-t-[#326755]">
                       <td class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-120 h-[72px] px-4 py-2 w-[400px] text-white text-sm font-normal leading-normal">{{ product.id }}</td>
                       <td class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-176 h-[72px] px-4 py-2 w-14 text-sm font-normal leading-normal">
+                        {% if product.image %}
                         <div
                           class="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10"
                           style="background-image: url('{{ product.image.url }}');"
                         ></div>
+                        {% else %}
+                        <div class="w-10 h-10 rounded-full bg-gray-500"></div>
+                        {% endif %}
                       </td>
                       <td class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-296 h-[72px] px-4 py-2 w-[400px] text-[#92c9b7] text-sm font-normal leading-normal">
                         {{ product.product_name }}
                       </td>
                       <td class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-416 h-[72px] px-4 py-2 w-[400px] text-[#92c9b7] text-sm font-normal leading-normal">{{ product.category.name}}</td>
                       <td class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-536 h-[72px] px-4 py-2 w-[400px] text-[#92c9b7] text-sm font-normal leading-normal">{{ product.base_price }}</td>
-                      <td class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-656 h-[72px] px-4 py-2 w-[400px] text-[#92c9b7] text-sm font-normal leading-normal">{{ product.stock }}</td>
-                      <td class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-776 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
-                        {% if product.stock > 0 %}
-                        <button
-                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-[#23483c] text-white text-sm font-medium leading-normal w-full"
-                        >
-                          <span class="truncate">In Stock</span>
-                        </button>
+                      <td class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-656 h-[72px] px-4 py-2 w-[400px] text-[#92c9b7] text-sm font-normal leading-normal">{% if product.total_stock > 0 %}
+                        {{ product.total_stock }} 
                         {% else %}
-                        <button
-                          class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-[#23483c] text-white text-sm font-medium leading-normal w-full"
-                        >
-                          <span class="truncate">Out of Stock</span>
-                        </button>
-                        {% endif %}
-                      </td>
+                        <span class="text-danger">Out of Stock</span>
+                        {% endif %}</td>
+                      <td class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-776 h-[72px] px-4 py-2 w-60 text-sm font-normal leading-normal">
+                    {% if product.total_stock > 0 %}
+                    <button
+                      class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-green-600 text-white text-sm font-medium leading-normal w-full"
+                    >
+                      <span class="truncate">In Stock</span>
+                    </button>
+                    {% else %}
+                    <button
+                      class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-red-600 text-white text-sm font-medium leading-normal w-full"
+                    >
+                      <span class="truncate">Out of Stock</span>
+                    </button>
+                    {% endif %}
+                  </td>
                       <td class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-896 h-[72px] px-4 py-2 w-60 text-[#92c9b7] text-sm font-bold leading-normal tracking-[0.015em]">
                          <a href="{% url 'products:product_details' product.id %}" class="hover:underline">
                         View
@@ -325,6 +348,26 @@
         </div>
       </div>
     </div>
+
+    <script>
+  setTimeout(function () {
+    const messageBox = document.getElementById('message-box');
+
+    if (messageBox) {
+
+      // Smooth fade out
+      messageBox.style.transition = "opacity 0.5s ease";
+
+      messageBox.style.opacity = "0";
+
+      // Remove completely after fade
+      setTimeout(() => {
+        messageBox.style.display = "none";
+      }, 500);
+    }
+
+  }, 5000); // 5 seconds
+</script>
 
         <script>
   const input = document.getElementById("searchInput");

@@ -7,11 +7,12 @@ from django.contrib import messages
 from category.models import Category
 from products.models import ProductVariant
 from wishlist.models import Wishlist
+from django.views.decorators.cache import never_cache
 
 
 # Create your views here.
 
-
+@login_required(login_url='login')
 def add_to_cart(request,product_id):
     if not request.user.is_authenticated:
         messages.warning(request,"⚠️ Please Login to purchase the Product")
@@ -23,7 +24,7 @@ def add_to_cart(request,product_id):
     
     if not variant_id:
         messages.error(request,'Please select size and color.')
-        return redirect('wishlist')
+        return redirect(request.META.get('HTTP_REFERER', 'wishlist'))
 
     variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
 
@@ -45,7 +46,7 @@ def add_to_cart(request,product_id):
         variant=variant,
         defaults={
             'quantity': 1,
-            'price': product.base_price or product.offer_price
+            'price': product.offer_price or product.base_price
                   })
 
     #already exists in cart
@@ -58,7 +59,7 @@ def add_to_cart(request,product_id):
         
         #variant stock limit check
         if cart_item.quantity >= variant.stock:
-            messages.error(request,'NO More stock available.')
+            messages.error(request,'No More stock available.')
             return redirect('cart:view_cart')
         cart_item.quantity += 1
         cart_item.save()
@@ -68,13 +69,16 @@ def add_to_cart(request,product_id):
         messages.success(request,'Product added to the cart') 
 
     #remove from wishlist
-    if request.GET.get('from_wishlist') == 'true':
-        Wishlist.objects.filter(user=request.user,product=product).delete()    
-
+    if request.POST.get('from_wishlist') == 'true':
+        Wishlist.objects.filter(
+        user=request.user,
+        product=product
+    ).delete()
     return redirect('cart:view_cart')       
 
 
-@login_required
+@login_required(login_url='login')
+@never_cache
 def view_cart(request):
     categories = Category.objects.filter(is_active=True)  
     cart, created = Cart.objects.get_or_create(user = request.user)
@@ -90,7 +94,7 @@ def view_cart(request):
         'categories': categories,
     })  
 
-@login_required
+@login_required(login_url='login')
 def update_cart(request,item_id, action):
     cart_item = get_object_or_404(CartItem,id=item_id,cart__user=request.user)
 
@@ -107,7 +111,7 @@ def update_cart(request,item_id, action):
     cart_item.save()
     return redirect('cart:view_cart')  
 
-@login_required
+@login_required(login_url='login')
 def ajax_update_cart(request):
     if request.method == "POST":
         item_id = request.POST.get('item_id')
@@ -116,7 +120,7 @@ def ajax_update_cart(request):
         cart_item = get_object_or_404(CartItem,id=item_id,cart__user=request.user)
 
         if action == 'increase':
-            if cart_item.quantity < cart_item.product.stock:
+            if cart_item.quantity < cart_item.variant.stock:
                 cart_item.quantity += 1
         elif action == 'decrease':
             if cart_item.quantity > 1:
@@ -134,7 +138,7 @@ def ajax_update_cart(request):
         })                
 
 
-@login_required
+@login_required(login_url='login')
 def remove_from_cart(request,item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
     cart_item.delete()

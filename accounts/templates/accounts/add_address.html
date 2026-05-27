@@ -39,27 +39,21 @@
                 ></path>
               </svg>
             </div>
-            <h2 class="text-[#121717] text-lg font-bold leading-tight tracking-[-0.015em]">Footwear Co</h2>
+            <h2 class="text-[#121717] text-lg font-bold leading-tight tracking-[-0.015em]">Lotto Shoes</h2>
           </div>
           <div class="flex flex-1 justify-end gap-8">
             <div class="flex items-center gap-9">
-              <a class="text-[#121717] text-sm font-medium leading-normal" href="#">Formal</a>
-              <a class="text-[#121717] text-sm font-medium leading-normal" href="#">Casual</a>
-              <a class="text-[#121717] text-sm font-medium leading-normal" href="#">Running</a>
-             
+              {% for category in categories %}
+               <a
+                href="{% url 'user_product_list' %}?category={{ category.id }}"
+                class="text-[#121617] text-sm font-medium leading-normal"
+                >
+              {{ category.name }}
+              </a>
+               {% endfor %}
             </div>
             <div class="flex gap-2">
-              <button
-                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f1f4f4] text-[#121717] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
-              >
-                <div class="text-[#121717]" data-icon="MagnifyingGlass" data-size="20px" data-weight="regular">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                    <path
-                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
-                    ></path>
-                  </svg>
-                </div>
-              </button>
+             
               <a href="{% url 'profile'%}">
               <button
                 class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f1f4f4] text-[#121717] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
@@ -84,6 +78,29 @@
                   </svg>
                 </div>
               </button>
+              <!-- LOGOUT BUTTON  -->
+              <form method="POST" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button
+                  type="submit"
+                  class="w-full flex items-center gap-3 px-4 py-2 rounded-md text-gray-700 hover:bg-red-50 hover:text-red-600 transition duration-150"
+                >
+                  <!-- Logout Icon -->
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                    viewBox="0 0 256 256"
+                  >
+                    <path
+                      d="M216,128a8,8,0,0,1-8,8H111.31l26.35,26.34a8,8,0,0,1-11.32,11.32l-40-40a8,8,0,0,1,0-11.32l40-40a8,8,0,0,1,11.32,11.32L111.31,120H208A8,8,0,0,1,216,128ZM48,40A16,16,0,0,1,64,24h72a8,8,0,0,1,0,16H64V216h72a8,8,0,0,1,0,16H64a16,16,0,0,1-16-16Z"
+                    ></path>
+                  </svg>
+
+                  <span class="text-sm font-medium">Logout</span>
+                </button>
+              </form>
             </div>
           </div>
         </header>
@@ -140,6 +157,7 @@
           <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
              <form method="POST" action="{% url 'add_address' %}">
               {% csrf_token %}
+              <input type="hidden" name="next" value="{{ next }}">
             <div class="flex flex-wrap justify-between gap-3 p-4"><p class="text-[#121717] tracking-light text-[32px] font-bold leading-tight min-w-72">Add New Address</p></div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
@@ -286,7 +304,7 @@
                   </div>
                 </a>
               </div>
-              <p class="text-[#678383] text-base font-normal leading-normal">@2024 Footwear Co. All rights reserved.</p>
+              <p class="text-[#678383] text-base font-normal leading-normal">@2026 Lotto Shoes All rights reserved.</p>
             </footer>
           </div>
         </footer>

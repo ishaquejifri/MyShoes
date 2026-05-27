@@ -170,11 +170,11 @@
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
-                <p class="text-white text-base font-medium leading-normal pb-2">Amount</p>
+                <p class="text-white text-base font-medium leading-normal pb-2">Price</p>
                 <input
                   type="number"
                   name="base_price"
-                  placeholder="Enter amount"
+                  placeholder="Enter price"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#356454] bg-[#1a322a] focus:border-[#356454] h-14 placeholder:text-[#94c7b6] p-[15px] text-base font-normal leading-normal"
                   value="{{ form.base_price.value|default:'' }}"
                 />
@@ -182,28 +182,17 @@
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
-                <p class="text-white text-base font-medium leading-normal pb-2">Offer</p>
+                <p class="text-white text-base font-medium leading-normal pb-2">Offer Price</p>
                 <input
                   type="number"
                   name="offer_price"
-                  placeholder="Enter offer"
+                  placeholder="Enter offer Price"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#356454] bg-[#1a322a] focus:border-[#356454] h-14 placeholder:text-[#94c7b6] p-[15px] text-base font-normal leading-normal"
                   value="{{ form.offer_price.value|default:'' }}"
                 />
               </label>
             </div>
-            <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
-              <label class="flex flex-col min-w-40 flex-1">
-                <p class="text-white text-base font-medium leading-normal pb-2">Stock</p>
-                <input
-                  type="number"
-                  name="stock"
-                  placeholder="Enter Stock"
-                  class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-0 border border-[#356454] bg-[#1a322a] focus:border-[#356454] h-14 placeholder:text-[#94c7b6] p-[15px] text-base font-normal leading-normal"
-                  value="{{ form.stock.value|default:'' }}"
-                />
-              </label>
-            </div>
+            
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-white text-base font-medium leading-normal pb-2">Category</p>
@@ -225,6 +214,7 @@
                 </select>
               </label>
             </div>
+            
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-white text-base font-medium leading-normal pb-2">Product Description</p>

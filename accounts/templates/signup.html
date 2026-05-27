@@ -21,7 +21,9 @@
       style="--checkbox-tick-svg: url('data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(255,255,255)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e'); font-family: Manrope, &quot;Noto Sans&quot;, sans-serif;"
     >
       <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f2f3f3] px-10 py-3">
+        <header
+          class="fixed top-0 left-0 w-full z-50 bg-white shadow-md flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f2f3f3] px-10 py-3 bg-white"
+        >
           <div class="flex items-center gap-4 text-[#141515]">
             <div class="size-4">
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -43,23 +45,18 @@
           </div>
           <div class="flex flex-1 justify-end gap-8">
             <div class="flex items-center gap-9">
-              <a class="text-[#141515] text-sm font-medium leading-normal" href="#">Formal</a>
-              <a class="text-[#141515] text-sm font-medium leading-normal" href="#">Casual</a>
-              <a class="text-[#141515] text-sm font-medium leading-normal" href="#">Running</a>
+              {% for category in categories %}
+              <a
+                href="{% url 'user_product_list' %}?category={{ category.id }}"
+                class="text-[#121617] text-sm font-medium leading-normal"
+              >
+                {{ category.name }}
+              </a>
+              {% endfor %}
               
             </div>
             <div class="flex gap-2">
-              <button
-                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f2f3f3] text-[#141515] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
-              >
-                <div class="text-[#141515]" data-icon="MagnifyingGlass" data-size="20px" data-weight="regular">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                    <path
-                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
-                    ></path>
-                  </svg>
-                </div>
-              </button>
+              
               <button
                 class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f2f3f3] text-[#141515] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
               >
@@ -85,7 +82,7 @@
             </div>
           </div>
         </header>
-        <div class="flex flex-1 justify-center items-center px-6 py-8">
+        <div class="flex flex-1 justify-center items-center px-6 py-8 pt-24">
   <div class="w-full max-w-md bg-white shadow-md rounded-lg p-6">
 
     <h1 class="text-xl font-bold text-center mb-5">Create Account</h1>
@@ -116,7 +113,11 @@
         <label class="block text-sm font-medium mb-1">First Name</label>
         <input
           type="text"
-          name="first_name" 
+          name="first_name"
+          minlength='3'
+          maxlength='15'
+          pattern='[A-Za-z ]+'
+          title='Only letters and spaces allowed'
           placeholder="Enter your first name"
           class="w-full border border-gray-300 rounded-md h-10 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
         required>
@@ -127,6 +128,10 @@
         <input
           type="text"
           name="last_name"
+          minlength="3"
+          maxlength="15"
+          pattern="[A-Za-z ]+"
+          title="Only letters and spaces allowed"
           placeholder="Enter your last name"
           class="w-full border border-gray-300 rounded-md h-10 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
         required>
@@ -147,6 +152,10 @@
         <input
           type="text"
           name="phone"
+          pattern="[0-9]{10}"
+          maxlength="10"
+          minlength="10"
+          title="Enter a valid 10 digit phone number"
           placeholder="Enter your phone number"
           class="w-full border border-gray-300 rounded-md h-10 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
         required>
@@ -159,6 +168,7 @@
       type="password"
       id="password"
       name="password"
+      minlength='8'
       placeholder="Enter your password"
       class="w-full border border-gray-300 rounded-md h-10 px-3 pr-10 focus:outline-none focus:ring-1 focus:ring-gray-400"
     required>
@@ -239,11 +249,11 @@ function togglePassword(fieldId) {
           <div class="flex max-w-[960px] flex-1 flex-col">
             <footer class="flex flex-col gap-6 px-5 py-10 text-center @container">
               <div class="flex flex-wrap items-center justify-center gap-6 @[480px]:flex-row @[480px]:justify-around">
-                <a class="text-[#727978] text-base font-normal leading-normal min-w-40" href="#">About Us</a>
-                <a class="text-[#727978] text-base font-normal leading-normal min-w-40" href="#">Contact</a>
-                <a class="text-[#727978] text-base font-normal leading-normal min-w-40" href="#">FAQ</a>
-                <a class="text-[#727978] text-base font-normal leading-normal min-w-40" href="#">Returns &amp; Exchanges</a>
-                <a class="text-[#727978] text-base font-normal leading-normal min-w-40" href="#">Privacy Policy</a>
+                <a class="text-[#727978] text-sm font-normal leading-normal min-w-40" href="#">About Us</a>
+                <a class="text-[#727978] text-sm font-normal leading-normal min-w-40" href="#">Contact</a>
+                <a class="text-[#727978] text-sm font-normal leading-normal min-w-40" href="#">FAQ</a>
+                <a class="text-[#727978] text-sm font-normal leading-normal min-w-40" href="#">Returns &amp; Exchanges</a>
+                <a class="text-[#727978] text-sm font-normal leading-normal min-w-40" href="#">Privacy Policy</a>
               </div>
               <div class="flex flex-wrap justify-center gap-4">
                 <a href="#">
@@ -274,7 +284,7 @@ function togglePassword(fieldId) {
                   </div>
                 </a>
               </div>
-              <p class="text-[#727978] text-base font-normal leading-normal">@2026 Lotto Shoes. All rights reserved.</p>
+              <p class="text-[#727978] text-sm font-normal leading-normal">@2026 Lotto Shoes All rights reserved.</p>
             </footer>
           </div>
         </footer>
@@ -287,7 +297,7 @@ setTimeout(function() {
   if (messageBox) {
     messageBox.style.display = "none";
   }
-}, 10000); // 10000ms = 10 seconds
+}, 5000); // 5000ms = 5 seconds
 </script>  
 
   </body>

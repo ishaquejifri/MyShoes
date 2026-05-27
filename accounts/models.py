@@ -10,7 +10,7 @@ class CustomUser(AbstractUser):
     profile_image = models.ImageField(upload_to='profile_images/',blank=True,null=True)
 
     def __str__(self):
-        return self.username
+        return self.username 
     
 
 class Address(models.Model):

@@ -145,23 +145,44 @@
             <form method="POST" enctype="multipart/form-data">                
                     {% csrf_token %}
             <div class="p-4 @container">
-              <div class="flex flex-col items-stretch justify-start rounded-lg @xl:flex-row @xl:items-start">
-                <img 
-                  id="imagePreview"
-                  src=""
-                  class="w-full aspect-video object-cover rounded-lg"/>
-                <div class="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-1 py-4 @xl:px-4">
-                  <p class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">Category Thumbnail</p>
-                  <div class="flex items-end gap-3 justify-between">
-                    <p class="text-[#9abcae] text-base font-normal leading-normal">Upload an image for the category</p>
-                    <label class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-8 px-4 bg-[#00cc77] text-[#101815] text-sm font-medium leading-normal">
-                    <span class="truncate">Upload Image</span>
-                    <input type="file" name="image" class="hidden" onchange="previewImage(event)">
-                    </label>
-                  </div>
-                </div>
-              </div>  
-            </div>
+  <div class="flex flex-col items-stretch justify-start rounded-lg @xl:flex-row @xl:items-start gap-4">
+
+    <!-- Image Preview -->
+    <div class="w-full @xl:w-64 flex justify-center">
+      <img 
+        id="imagePreview"
+        src=""
+        class="hidden w-64 h-40 object-cover rounded-lg border border-gray-300 shadow-sm"
+      />
+    </div>
+
+    <!-- Upload Section -->
+    <div class="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-2 py-4 @xl:px-4">
+      <p class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">
+        Category Thumbnail
+      </p>
+
+      <p class="text-[#9abcae] text-base font-normal leading-normal">
+        Upload an image for the category
+      </p>
+
+      <div>
+        <label class="flex w-fit min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-[#00cc77] text-[#101815] text-sm font-medium leading-normal hover:bg-green-500 transition">
+          
+          <span class="truncate">Upload Image</span>
+
+          <input 
+            type="file"
+            name="image"
+            accept="image/*"
+            class="hidden"
+            onchange="previewImage(event)"
+          >
+        </label>
+      </div>
+    </div>
+  </div>
+</div>
             
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
@@ -214,16 +235,29 @@
         </div>
       </div>
     </div>
-
+    
     <script>
-      function previewImage(event) {
-      const reader = new FileReader();
-      reader.onload = function () {
-      document.getElementById('imagePreview').src = reader.result;
-      };
-      reader.readAsDataURL(event.target.files[0]);
-      }
-    </script>
+          function previewImage(event) {
 
+            const image = document.getElementById('imagePreview');
+            const file = event.target.files[0];
+
+            if (file) {
+
+              const reader = new FileReader();
+
+              reader.onload = function(e) {
+
+                image.src = e.target.result;
+
+                // Show image preview
+                image.classList.remove('hidden');
+              };
+
+              reader.readAsDataURL(file);
+            }
+          }
+      </script>
+    
   </body>
 </html>

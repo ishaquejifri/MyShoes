@@ -78,85 +78,101 @@
             </div>
           </div>
         </header>
+        
+            {% if messages %}
+          <div class="fixed top-20 right-5 z-50 space-y-2">
+            {% for message in messages %}
+              <div class="alert-message px-4 py-2 rounded-lg text-white shadow-lg
+                {% if message.tags == 'error' %}bg-red-500{% endif %}
+                {% if message.tags == 'success' %}bg-green-500{% endif %}
+                {% if message.tags == 'info' %}bg-blue-500{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+
         <div class="gap-1 px-6 flex flex-1 justify-center py-5 pt-24">
           <div class="layout-content-container flex flex-col max-w-[920px] flex-1">
             <div class="flex flex-wrap justify-between gap-3 p-4"><p class="text-[#101819] tracking-light text-[32px] font-bold leading-tight min-w-72">My Wishlist</p></div>
-            <div class="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-6 p-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
 
   {% if wishlist_items %}
 
     {% for item in wishlist_items %}
 
-      <div class="bg-white rounded-xl shadow-sm p-3 flex flex-col gap-3">
+      <div class="bg-white rounded-xl shadow-sm p-3 flex flex-col h-[420px]">
 
-        <!-- Product Image -->
-        <div
-          class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg"
-          style='background-image: url("{{ item.product.image.url }}");'
-        ></div>
+  <!-- Product Image -->
+  <div class="w-full h-52 overflow-hidden rounded-lg bg-gray-100">
+    <img
+      src="{{ item.product.image.url }}"
+      alt="{{ item.product.product_name }}"
+      class="w-full h-full object-cover"
+    />
+  </div>
 
-        <!-- Product Details -->
-        <div>
-          <p class="text-[#101819] text-base font-semibold leading-normal">
-            {{ item.product.product_name }}
-          </p>
+  <!-- Product Details -->
+  <div class="mt-3 flex-1 flex flex-col">
+    
+    <p class="text-[#101819] text-base font-semibold line-clamp-1">
+      {{ item.product.product_name }}
+    </p>
 
-          <p class="text-[#57858e] text-sm font-normal leading-normal">
-            ₹{{ item.product.offer_price }}
-          </p>
+    <p class="text-[#298fa3] text-lg font-bold mt-1">
+      ₹{{ item.product.offer_price }}
+    </p>
 
-          {% if item.product.stock > 0 %}
-            <p class="text-green-600 text-sm font-medium mt-1">
-              In Stock
-            </p>
-          {% else %}
-            <p class="text-red-500 text-sm font-medium mt-1">
-              Out of Stock
-            </p>
-          {% endif %}
-        </div>
+    {% if item.product.total_stock > 0 %} 
+      <p class="text-green-600 text-sm font-medium mt-1">
+        In Stock
+      </p>
+    {% else %}
+      <p class="text-red-500 text-sm font-medium mt-1">
+        Out of Stock
+      </p>
+    {% endif %}
 
-        <!-- Buttons -->
-        <div class="flex gap-2 mt-2">
+    <!-- Variant Selection -->
+    <form method="POST"
+      action="{% url 'cart:add_to_cart' item.product.id %}"
+      class="flex-1">
 
-          <!-- Add to Cart -->
-         <form method="POST"
-          action="{% url 'cart:add_to_cart' item.product.id %}?from_wishlist=true"
-          class="flex-1">
+    {% csrf_token %}
 
-            {% csrf_token %}
-              <!-- Variant Selection -->
-              <select name="variant_id"
-                 class="w-full mb-2 rounded-lg border border-gray-300 p-2 text-sm">
+    <input type="hidden" name="from_wishlist" value="true">
 
-                <option value="">Select Size & Color</option>
+    <select name="variant_id"
+      class="w-full mb-2 rounded-lg border border-gray-300 p-2 text-sm">
 
-              {% for variant in item.product.variants.all %}
-                {% if variant.stock > 0 %}
-                <option value="{{ variant.id }}">
-                    {{ variant.size }} - {{ variant.color }}
-                </option>
-                 {% endif %}
-              {% endfor %}
-              </select>
+      <option value="">Size & Color</option>
 
-                <button type="submit"
-                class="w-full flex items-center justify-center rounded-lg h-10 px-4 bg-[#298fa3] text-white text-sm font-bold">
+      {% for variant in item.product.variants.all %}
+        {% if variant.stock > 0 %}
+          <option value="{{ variant.id }}">
+            {{ variant.size }} - {{ variant.color }}
+          </option>
+        {% endif %}
+      {% endfor %}
+    </select>
 
-                Add to Cart
-                </button>
+    <button type="submit"
+      class="w-full flex items-center justify-center rounded-lg h-10 px-4 bg-[#298fa3] text-white text-sm font-bold">
 
-          </form>
-          <!-- Remove -->
-          <a href="{% url 'remove_wishlist' item.id %}"
-            class="flex-1 flex items-center justify-center rounded-lg h-10 px-4 bg-[#e9f0f1] text-[#101819] text-sm font-bold">
+      Add to Cart
+    </button>
+    
 
-            Remove
-          </a>
+</form>
 
-        </div>
+       
 
-      </div>
+
+
+    
+
+  </div>
+</div>
 
     {% endfor %}
 
@@ -200,11 +216,13 @@
               </div>
             </div>
             <div class="flex px-4 py-3">
+              <a href="{% url 'cart:view_cart'%}">
               <button
                 class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-[#298fa3] text-[#f9fbfb] text-base font-bold leading-normal tracking-[0.015em]"
               >
                 <span class="truncate">View Cart</span>
               </button>
+            </a>
             </div>
           </div>
         </div>
@@ -253,5 +271,19 @@
         </footer>
       </div>
     </div>
+
+    <script>
+  setTimeout(() => {
+    const alerts = document.querySelectorAll('.alert-message');
+    alerts.forEach((alert) => {
+      alert.style.transition = 'opacity 0.5s ease';
+      alert.style.opacity = '0';
+      setTimeout(() => {
+        alert.remove();
+      }, 500);
+    });
+  }, 5000); // 5 seconds
+  </script>
+
   </body>
 </html>

@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 from .models import Category
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db.models import Count
+from django.db.models import Count,Q
 from django.core.paginator import Paginator
 from django.views.decorators.cache import never_cache
 
@@ -14,7 +14,7 @@ def category_list(request):
 
     
     categories = Category.objects.annotate(
-        product_count=Count('product')
+        product_count=Count('products', filter=Q(products__is_deleted=False))
     ).order_by('-id')
 
     if query:

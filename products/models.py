@@ -9,10 +9,9 @@ class Product(models.Model):
     product_name = models.CharField(max_length=200, unique=True)
     slug = models.SlugField(max_length=200, unique=True)
     base_price = models.DecimalField(max_digits=10, decimal_places=2)
-    stock = models.PositiveIntegerField(default=0)
     description = models.TextField()
     is_listed = models.BooleanField(default=True) 
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE,related_name='products')
     image = models.ImageField(upload_to='products/')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -20,6 +19,10 @@ class Product(models.Model):
     is_available = models.BooleanField(default=True)
     is_blocked = models.BooleanField(default=False)
     offer_price = models.DecimalField(max_digits=10,decimal_places=2,null=True,blank=True)
+
+    @property
+    def total_stock(self):
+        return sum(variant.stock for variant in self.variants.all())
 
     @property
     def discount_percentage(self): 
@@ -46,8 +49,8 @@ class ProductImage(models.Model):
         width, height = img.size
         min_dim = min(width,height)
 
-        left = (width - min_dim)
-        top = (height - min_dim)
+        left = (width - min_dim) // 2
+        top = (height - min_dim) // 2
         right = (width + min_dim)
         bottom = (width + min_dim)
 
@@ -81,6 +84,8 @@ class ProductVariant(models.Model):
     size = models.CharField(max_length=20)
     color = models.CharField(max_length=50)
     stock = models.PositiveIntegerField(default=0)
+    price = models.DecimalField(max_digits=10,decimal_places=2,null=True)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return f"{self.product.product_name} - {self.size} - {self.color}"

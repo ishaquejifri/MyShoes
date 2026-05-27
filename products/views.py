@@ -48,34 +48,36 @@ def add_product(request):
     total_images = len(files) if files else len(cropped_gallery_images)
 
     if request.method == 'POST':
+        cropped_image = request.POST.get('cropped_image')
+        cropped_gallery_images = request.POST.getlist('cropped_gallery_images')
 
-        if total_images < 3 :
-                form = ProductForm(request.POST,request.FILES)
-                messages.error(request,'Please Upload atleast 3 Images')
-        elif total_images > 5:
-                form = ProductForm(request.POST,request.FILES)
-                messages.error(request,'Maximum 5 Images are Allowed')   
+        if not cropped_image:
+             messages.error(request,'Please crop the main image before submitting.')
+        elif len(cropped_gallery_images) < 3:
+             messages.error(request,'Please crop and upload atleast 3 gallery images.')
+        elif len(cropped_gallery_images) > 5:
+             messages.error(request,'Maximum 5 gallery images are allowed.')
         else:
-               form = ProductForm(request.POST,request.FILES)
-               
-               if form.is_valid():
+             form = ProductForm(request.POST,request.FILES)    
+
+                  
+             if form.is_valid():
                    product = form.save(commit=False)
+                   
+                   
+                    #save cropped main image                 
+                   format,imgstr = cropped_image.split(';base64,')
+                   ext = format.split('/')[-1]
 
-                   cropped_image = request.POST.get('cropped_image')
-
-                   if cropped_image:                    
-                    format,imgstr = cropped_image.split(';base64,')
-                    ext = format.split('/')[-1]
-
-                    product.image = ContentFile(
+                   product.image = ContentFile(
                         base64.b64decode(imgstr),
                         name='cropped.' + ext
                     )
-
-                    product.save()    
-
-                    if cropped_gallery_images:
-                        for img in cropped_gallery_images:
+                    #save product first
+                   product.save()    
+                   
+                    #save gallery images              
+                   for img in cropped_gallery_images:
                              format, imgstr = img.split(';base64,')
                              ext = format.split('/')[-1]
 
@@ -84,16 +86,11 @@ def add_product(request):
                                name='gallery.' + ext
                             )
 
-                             ProductImage.objects.create(product=product, image=file)
-
-                    else:
-                        for file in files:
-                            ProductImage.objects.create(product=product, image=file)
-                            
+                             ProductImage.objects.create(product=product, image=file)                                     
             
-                    messages.success(request,'Product Added Successfully!')
-                    return redirect('product_list')
-               else:
+                   messages.success(request,'Product Added Successfully!')
+                   return redirect('products:add_variant',product.id)
+             else:
                     messages.error(request,'Please correct the form Errors')                           
     
     return render(request,'add_product.html',{
@@ -106,6 +103,7 @@ def add_product(request):
 def edit_product(request,id):
     product = get_object_or_404(Product,id=id)
     gallery_images = product.images.all()
+    variants = product.variants.all()
 
     if request.method == "POST":
         form = ProductForm(request.POST, request.FILES, instance=product)
@@ -120,6 +118,9 @@ def edit_product(request,id):
 
             updated_product.save()
 
+            variant_ids = request.POST.getlist('variant_id')
+            
+
             gallery_images = request.FILES.getlist('gallery_images')
 
             if gallery_images:
@@ -132,14 +133,17 @@ def edit_product(request,id):
 
                  )
 
+            messages.success(request, 'Product Edited Successfully.')   
             return redirect('products:product_list')
-        
+        else:
+             messages.error(request,'Please correct the form Errors')
     else:
         form = ProductForm(instance=product)
     
     return render(request,'edit_product.html',{ 
         'form': form,
         'product': product,
+        'variants': variants,
         'gallery_images': gallery_images,
         'categories': Category.objects.all()
           })
@@ -151,8 +155,8 @@ def product_details(request,id):
     product = get_object_or_404(Product,id=id)
     variants = product.variants.all()
 
-    sizes = variants.value_list('size', flat=True).distinct()
-    colors = variants.value_list('color', flat=True).distinct()
+    sizes = variants.values_list('size', flat=True).distinct()
+    colors = variants.values_list('color', flat=True).distinct()
 
 
     return render(request,'product_details.html', { 
@@ -206,13 +210,14 @@ def edit_variant(request, variant_id):
         'variant': variant
      })          
 
-
+@login_required(login_url='login')
+@never_cache
 def delete_variant(request, variant_id):
      variant = get_object_or_404(ProductVariant,id=variant_id)
      product_id = variant.product.id
 
      variant.delete()
-
+     messages.success(request, 'Variant Deleted Successfully.')
      return redirect('products:product_details',id=product_id)
 
 @login_required(login_url='admin_login')
@@ -221,6 +226,7 @@ def delete_product(request,id):
      product = get_object_or_404(Product, id=id, is_deleted=False)
      product.is_deleted = True
      product.save()
+     messages.success(request, 'Product Deleted Successfully.')
      return redirect('products:product_list')
 
 
