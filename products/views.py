@@ -11,8 +11,9 @@ from django.contrib import messages
 
 # Create your views here.
 
-@login_required(login_url='admin_login')
+
 @never_cache
+@login_required(login_url='admin_login')
 def product_list(request):
     query = request.GET.get('q')
     category_id = request.GET.get('category')
@@ -34,8 +35,9 @@ def product_list(request):
           'query': query
           })
 
-@login_required(login_url='admin_login')
+
 @never_cache
+@login_required(login_url='admin_login')
 def add_product(request):
 
     form = ProductForm(request.POST or None, request.FILES or None)
@@ -98,8 +100,9 @@ def add_product(request):
         'categories': categories  
           })
 
-@login_required(login_url='admin_login')
+
 @never_cache
+@login_required(login_url='admin_login')
 def edit_product(request,id):
     product = get_object_or_404(Product,id=id)
     gallery_images = product.images.all()
@@ -148,8 +151,8 @@ def edit_product(request,id):
         'categories': Category.objects.all()
           })
 
-@login_required(login_url='admin_login')
 @never_cache
+@login_required(login_url='admin_login')
 def product_details(request,id):
 
     product = get_object_or_404(Product,id=id)
@@ -210,8 +213,9 @@ def edit_variant(request, variant_id):
         'variant': variant
      })          
 
-@login_required(login_url='login')
+
 @never_cache
+@login_required(login_url='admin_login')
 def delete_variant(request, variant_id):
      variant = get_object_or_404(ProductVariant,id=variant_id)
      product_id = variant.product.id
@@ -220,8 +224,9 @@ def delete_variant(request, variant_id):
      messages.success(request, 'Variant Deleted Successfully.')
      return redirect('products:product_details',id=product_id)
 
-@login_required(login_url='admin_login')
+
 @never_cache
+@login_required(login_url='admin_login')
 def delete_product(request,id):
      product = get_object_or_404(Product, id=id, is_deleted=False)
      product.is_deleted = True
