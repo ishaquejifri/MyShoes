@@ -4,6 +4,8 @@ from products.models import Product
 from category.models import Category
 from django.core.paginator import Paginator
 from wishlist.models import Wishlist
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -24,6 +26,8 @@ def home_page(request):
     })
 
 
+@never_cache
+@login_required
 def user_product_list(request, category_id=None):
     products = Product.objects.filter(
         is_deleted=False,
@@ -37,8 +41,12 @@ def user_product_list(request, category_id=None):
     category_id = request.GET.get('category')
 
     if category_id:
-        category = get_object_or_404(Category,id=category_id)
-        products = products.filter(category=category)
+        category = Category.objects.filter(id=category_id, is_active=True).first()
+
+        if category:
+            products = products.filter(category=category)
+        else:
+            messages.warning(request, 'No More.')    
 
     wishlist_product_ids = []
 
@@ -89,15 +97,23 @@ def user_product_list(request, category_id=None):
     })
 
 
+@never_cache
+@login_required
 def user_product_details(request,pk):
     categories = Category.objects.filter(is_active=True)
 
     product = get_object_or_404(Product,
                                  pk=pk,
-                                 is_deleted=False,
-                                 is_available=True,
-                                 is_blocked=False,
-                                 is_listed=True)
+                                 is_deleted=False
+                                 )
+    
+    if ( not product.is_listed  or not product.is_available or product.is_blocked ):
+        return render(
+        request,
+        'product_unavailable.html',
+        {'product': product},
+        status=404
+    )
 
     variants = product.variants.all()
 
@@ -129,6 +145,8 @@ def user_product_details(request,pk):
     })
 
 
+@never_cache
+@login_required
 def add_to_wishlist(request,product_id):
     product = get_object_or_404(Product, id = product_id)
 

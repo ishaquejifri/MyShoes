@@ -246,6 +246,7 @@
                       <th class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-536 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Price</th>
                       <th class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-656 px-4 py-3 text-left text-white w-[400px] text-sm font-medium leading-normal">Stock Level</th>
                       <th class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-776 px-4 py-3 text-left text-white w-60 text-sm font-medium leading-normal">Status</th>
+                      <th class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-776 px-4 py-3 text-left text-white w-60 text-sm font-medium leading-normal">Listing</th>
                       <th class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-896 px-4 py-3 text-left text-white w-60 text-[#92c9b7] text-sm font-medium leading-normal">
                         Actions
                       </th>
@@ -290,14 +291,38 @@
                     </button>
                     {% endif %}
                   </td>
+                      <td>
+                        {% if product.is_listed %}
+                            <span class="bg-green-600 px-2 py-1 rounded">
+                                Listed
+                            </span>
+                        {% else %}
+                            <span class="bg-yellow-600 px-2 py-1 rounded">
+                                Unlisted
+                            </span>
+                        {% endif %}
+                    </td>
                       <td class="table-c7d2051f-19b8-4282-b3f3-09e31bcc72dc-column-896 h-[72px] px-4 py-2 w-60 text-[#92c9b7] text-sm font-bold leading-normal tracking-[0.015em]">
                          <a href="{% url 'products:product_details' product.id %}" class="hover:underline">
                         View
                         </a> | <a href="{% url 'products:edit_product' product.id %}" class="hover:underline">
                         Edit
-                        </a> | <a href="{% url 'products:delete_product' product.id %}" 
+                        </a> |
+                        {% if product.is_listed %}
+                                <a href="{% url 'products:toggle_listing' product.id %}"
+                                  class="text-yellow-400 hover:underline"
+                                  onclick="return confirm('Unlist this product?');">
+                                  Unlist
+                                </a>
+                                {% else %}
+                                <a href="{% url 'products:toggle_listing' product.id %}"
+                                  class="text-green-400 hover:underline">
+                                  List
+                                </a>
+                                {% endif %}
+                        |<a href="{% url 'products:delete_product' product.id %}" 
                               class="text-red-400 hover:underline"
-                              onclick="return confirm('Are you sure you want to delete this product?');">
+                              onclick="return confirm('Move this product to trash?');">
                               Delete
                               </a>
                              |
@@ -350,24 +375,19 @@
     </div>
 
     <script>
-  setTimeout(function () {
-    const messageBox = document.getElementById('message-box');
-
-    if (messageBox) {
-
+      setTimeout(function () {
+      const messageBox = document.getElementById('message-box');
+      if (messageBox) {
       // Smooth fade out
       messageBox.style.transition = "opacity 0.5s ease";
-
       messageBox.style.opacity = "0";
-
       // Remove completely after fade
       setTimeout(() => {
         messageBox.style.display = "none";
       }, 500);
     }
-
-  }, 5000); // 5 seconds
-</script>
+      }, 5000); // 5 seconds
+    </script>
 
         <script>
   const input = document.getElementById("searchInput");

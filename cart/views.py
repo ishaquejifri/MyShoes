@@ -11,7 +11,7 @@ from django.views.decorators.cache import never_cache
 
 
 # Create your views here.
-
+@never_cache
 @login_required(login_url='login')
 def add_to_cart(request,product_id):
     if not request.user.is_authenticated:
@@ -77,8 +77,8 @@ def add_to_cart(request,product_id):
     return redirect('cart:view_cart')       
 
 
-@login_required(login_url='login')
 @never_cache
+@login_required(login_url='login')
 def view_cart(request):
     categories = Category.objects.filter(is_active=True)  
     cart, created = Cart.objects.get_or_create(user = request.user)
@@ -94,6 +94,7 @@ def view_cart(request):
         'categories': categories,
     })  
 
+@never_cache
 @login_required(login_url='login')
 def update_cart(request,item_id, action):
     cart_item = get_object_or_404(CartItem,id=item_id,cart__user=request.user)
@@ -137,7 +138,7 @@ def ajax_update_cart(request):
             'cart_count': cart_item.cart.items.count()
         })                
 
-
+@never_cache
 @login_required(login_url='login')
 def remove_from_cart(request,item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)

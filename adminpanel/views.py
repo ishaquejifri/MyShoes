@@ -55,6 +55,7 @@ def admin_dashboard(request):
     return render(request, "dashboard.html")
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def user_list(request):
 

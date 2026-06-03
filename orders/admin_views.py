@@ -8,9 +8,11 @@ from products.models import Product,ProductVariant
 from django.views.decorators.csrf import csrf_protect
 from django.db.models import Q
 from django.views.decorators.cache import never_cache
+from adminpanel.decorators import admin_required
 
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def admin_order_list(request):
 
@@ -51,6 +53,7 @@ def admin_order_list(request):
 
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def admin_order_details(request, order_id):
 
@@ -68,6 +71,7 @@ def admin_order_details(request, order_id):
 
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def admin_update_order_status(request, order_id):
     order = get_object_or_404(Order, order_id=order_id)
@@ -99,6 +103,7 @@ def admin_update_order_status(request, order_id):
     return redirect('admin_order_details', order_id=order.order_id)
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def inventory_management(request):
 
@@ -138,6 +143,7 @@ def inventory_management(request):
     return render(request, 'inventory.html', context) 
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def update_stock(request, variant_id):
 

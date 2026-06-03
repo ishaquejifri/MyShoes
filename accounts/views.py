@@ -8,6 +8,7 @@ from .models import CustomUser,Address
 from .forms import SignupForm, LoginForm,AddressForm
 from django.contrib import messages
 from django.utils import timezone
+from datetime import timedelta
 from django.conf import settings
 from products.models import Category
 import re
@@ -51,6 +52,7 @@ def signup(request):
         
         if not re.fullmatch(r'^[A-Za-z ]+$', last_name):
             messages.error(request, 'Last name should contain only letters and space.')
+            return redirect('signup')
 
         # Email validation
         try:
@@ -121,16 +123,37 @@ def signup(request):
             'email': email,
             'phone': digits_only,
             'password': password,
-            'otp': otp
+            'otp': otp,
+            'otp_created_at': timezone.now().isoformat(),
         }
 
         request.session['otp'] = otp
         request.session['signup_email'] = email
         request.session['otp_purpose'] = 'signup'
 
+        message = f'''
+            Hello,
+            Thank you for using MyShoes.
+
+            Your One-Time password (OTP) is:
+
+            >>>> {otp} <<<<
+
+            This OTP will expire in 2 minutes.
+
+            For your security:
+            • Do not share this otp with anyone.
+            • MyShoes will never ask your otp.
+            • If you did not request this OTP, please ignore this email.
+
+            Regards,
+            MyShoes Team.
+
+        '''
+
         send_mail(
-            'Your OTP Code',
-            f'Your OTP for signup is {otp}',
+            'MyShoes Account Verification OTP',
+            message,
             'ishaque7jifri@gmail.com',
             [email],
             fail_silently=False,
@@ -146,48 +169,93 @@ def signup(request):
 def generate_otp():
     return str(random.randint(100000, 999999))
 
+
 @never_cache
 def verify_otp(request):
-    
+
+    signup_data = request.session.get('signup_data')
+
     if request.method == 'POST':
+
         entered_otp = request.POST.get('otp')
-
-        signup_data = request.session.get('signup_data')
-
+      
+        # SIGNUP OTP VERIFICATION
+        
         if signup_data:
+
+            created_at = signup_data.get('otp_created_at')
+
+            if created_at:
+                created_at = timezone.datetime.fromisoformat(created_at)
+
+                if timezone.now() > created_at + timedelta(minutes=2):
+                    messages.error(request, 'OTP has expired')
+                    return redirect('signup')
+
             if entered_otp == signup_data['otp']:
 
                 user = User.objects.create_user(
                     username=signup_data['email'],
                     email=signup_data['email'],
-                    first_name = signup_data['first_name'],
-                    last_name = signup_data['last_name'],
-                    password= signup_data['password'],
-                    phone= signup_data['phone']
-            )
+                    first_name=signup_data['first_name'],
+                    last_name=signup_data['last_name'],
+                    password=signup_data['password'],
+                    phone=signup_data['phone']
+                )
 
-                del request.session['signup_data']
+                request.session.pop('signup_data', None)
+                request.session.pop('otp', None)
+                request.session.pop('signup_email', None)
+                request.session.pop('otp_purpose', None)
 
                 messages.success(request, 'Account created successfully')
                 return redirect('login')
-            else:
-                messages.error(request, 'Invalid OTP')
-                return redirect('verify_otp')
 
+            messages.error(request, 'Invalid OTP')
+            return redirect('verify_otp')
+        
+        # PASSWORD RESET OTP
+       
         reset_email = request.session.get('reset_email')
         reset_otp = request.session.get('reset_otp')
 
         if reset_email and reset_otp:
+
+            created_at = request.session.get('reset_otp_created_at')
+
+            if created_at:
+                created_at = timezone.datetime.fromisoformat(created_at)
+
+                if timezone.now() > created_at + timedelta(minutes=2):
+                    messages.error(request, 'OTP has expired')
+                    return redirect('forget_password')
+
             if str(entered_otp) == str(reset_otp):
                 return redirect('new_password')
-            else:
-                messages.error(request,'Invalid OTP')
-                return redirect('verify_otp')
 
-        messages.error(request,'Session Expired. Try again!')
-        return redirect('login')       
+            messages.error(request, 'Invalid OTP')
+            return redirect('verify_otp')
 
-    return render(request,'email/verify_otp.html')
+        messages.error(request, 'Session expired. Try again!')
+        return redirect('login')
+    
+    # TIMER DATA FOR TEMPLATE
+    
+    expiry_time = None
+
+    if signup_data:
+        expiry_time = signup_data.get('otp_created_at')
+
+    elif request.session.get('reset_otp_created_at'):
+        expiry_time = request.session.get('reset_otp_created_at')
+
+    return render(
+        request,
+        'email/verify_otp.html',
+        {
+            'otp_expiry': expiry_time
+        }
+    )
 
 @never_cache
 def resend_otp(request):
@@ -195,15 +263,30 @@ def resend_otp(request):
     signup_data = request.session.get('signup_data')
 
     if not signup_data:
-        return request('signup')
+        return redirect('signup')
     
     otp = generate_otp()
     signup_data['otp'] = otp
+    signup_data['otp_created_at'] = timezone.now().isoformat()
     request.session['signup_data'] = signup_data
+
+    message = f''' 
+
+        Hello,
+
+        Your new OTP is:
+
+        >>>> {otp} <<<<
+
+        This OTP will expire in 2 minutes.
+        Thanks
+        MyShoes
+
+       '''
 
     send_mail(
         'Your New OTP',
-        f'Your OTP is {otp}',
+        message,
         'ishaque7jifri@gmail.com',
         [signup_data['email']],
         fail_silently=False,        
@@ -268,10 +351,28 @@ def forget_password(request):
             request.session['reset_email'] = email
             request.session['reset_otp'] = otp
             request.session['otp_purpose'] = 'reset_password'
+            request.session['reset_otp_created_at'] = timezone.now().isoformat()
+
+            message = f"""
+                    Hello,
+
+                    We received a request to reset your MyShoes account password.
+
+                    Your OTP is:
+
+                    {otp}
+
+                    This OTP will expire in 5 minutes.
+
+                    If you did not request a password reset, please ignore this email.
+
+                    Regards,
+                    MyShoes Team
+                    """     
 
             send_mail(
-                "Password Reset OTP",
-                f"Your OTP is {otp}",
+                "MyShoes Account Reset Password OTP",
+                message,
                 "ishaque7jifri@gmail.com",
                 [email],
                 fail_silently=False
@@ -317,8 +418,9 @@ def new_password(request):
     
     return render(request,'password/new_password.html')
 
-@login_required(login_url='login')
+
 @never_cache
+@login_required(login_url='login')
 def profile(request):
 
     addresses = Address.objects.filter(user=request.user)
@@ -341,20 +443,76 @@ def profile(request):
         'categories': categories,
         })
 
-@login_required(login_url='login')
+
 @never_cache
+@login_required(login_url='login')
 def edit_profile(request):
 
     user = request.user
 
     if request.method == 'POST':
-        user.first_name = request.POST.get('first_name',user.first_name)
-        user.last_name = request.POST.get('last_name',user.last_name)
-        user.email = request.POST.get('email',user.email)
-        user.phone = request.POST.get('phone',user.phone)  
+        user.first_name = request.POST.get('first_name', '').strip()
+        user.last_name = request.POST.get('last_name', '').strip()
+        user.email = request.POST.get('email', '').strip()
+        user.phone = request.POST.get('phone', '').strip() 
+
+        if not all([user.first_name, user.last_name, user.email, user.phone]):
+            messages.error(request, 'All fields are required.')
+            return redirect('edit_profile')
+
+        if len(user.first_name) < 3 or len(user.first_name) > 15:
+            messages.error(request, 'First name must be between 3 and 15 characters.')
+            return redirect('edit_profile')
+        
+        if not re.fullmatch(r'^[A-Za-z ]+$', user.first_name):
+            messages.error(request, 'First name should contain only letters and spaces.')
+            return redirect('edit_profile')
+        
+        if len(user.last_name) < 3 or len(user.last_name) > 15:
+            messages.error(request, 'Last name must be between 3 and 15 characters.')
+            return redirect('edit_profile')
+        
+        if not re.fullmatch(r'^[A-Za-z ]+$', user.last_name):
+            messages.error(request, 'Last name should contain only letters and spaces.')
+            return redirect('edit_profile')
+        
+        try:
+            validate_email(user.email)
+        except ValidationError:
+            messages.error(request, 'Enter a valid Email address')
+            return redirect('edit_profile')
+
+        if User.objects.exclude(id=user.id).filter(email=user.email).exists():
+            messages.error(request, 'Email already existed')
+            return redirect('edit_profile') 
+
+        digits_only = re.sub(r'\D', '', user.phone)
+
+        if len(digits_only) != 10:
+            messages.error(request, 'Phone number must contain exactly 10 digits.')
+            return redirect('edit_profile')
+
+        if len(set(digits_only)) == 1:
+            messages.error(request, 'Invalid phone number.')
+            return redirect('edit_profile')
+
+        if User.objects.exclude(id=user.id).filter(phone=digits_only).exists():
+            messages.error(request, 'Phone number already registered.')
+            return redirect('edit_profile')
+
+        user.phone = digits_only
 
         if request.FILES.get('profile_image'):
             user.profile_image = request.FILES.get('profile_image')
+
+        if not request.FILES.get('profile_image') and (
+            user.first_name == request.user.first_name and
+            user.last_name == request.user.last_name and
+            user.email == request.user.email and
+            user.phone == request.user.phone
+            ):
+            messages.info(request, 'No changes detected.')
+            return redirect('profile')    
 
         user.save()
         messages.success(request,'Profile Updated successfully') 
@@ -362,8 +520,9 @@ def edit_profile(request):
 
     return render(request, 'accounts/edit_profile.html', {'user': user})   
 
-@login_required(login_url='login')
+
 @never_cache
+@login_required(login_url='login')
 def change_password(request):
     if request.method == 'POST':
         current_password = request.POST.get('current_password')
@@ -392,8 +551,9 @@ def change_password(request):
 
     return render(request, 'accounts/change_password.html')   
 
-@login_required(login_url='login')
+
 @never_cache
+@login_required(login_url='login')
 def change_email(request):
 
     if request.method == 'POST':
@@ -427,8 +587,9 @@ def change_email(request):
     return render(request, 'accounts/change_email.html') 
 
 
-@login_required(login_url='login')
+
 @never_cache
+@login_required(login_url='login')
 def email_change_otp(request):
     if request.method == "POST":
 
@@ -457,8 +618,9 @@ def email_change_otp(request):
 
     return render(request,'accounts/email_change_otp.html')
 
-@login_required(login_url='login')
+
 @never_cache
+@login_required(login_url='login')
 def my_address(request):
 
     addresses = Address.objects.filter(user=request.user).order_by('-id')
@@ -466,8 +628,9 @@ def my_address(request):
 
     return render(request,'accounts/my_address.html',{'addresses': addresses, 'categories': categories})    
 
-@login_required(login_url='login')
+
 @never_cache
+@login_required(login_url='login')
 def add_address(request):
 
     next_url = request.GET.get('next') or request.POST.get('next')
@@ -497,6 +660,8 @@ def add_address(request):
 
     return render(request,'accounts/add_address.html',{'form': form, 'next': next_url})
 
+@never_cache
+@login_required(login_url='login')
 def edit_address(request,id):
 
     next_url = request.GET.get('next') or request.POST.get('next')
@@ -531,10 +696,12 @@ def edit_address(request,id):
     return render(request,'accounts/edit_address.html',{
         'form': form,
         'address':address,
-        'next': next_url
+        'next': next_url    
         })  
-  
 
+
+@never_cache
+@login_required(login_url='login')
 def delete_address(request, id):
 
     if request.method != "POST":

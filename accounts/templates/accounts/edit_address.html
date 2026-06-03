@@ -154,7 +154,25 @@
           <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
             
             <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-
+                {% if messages %}
+          <div class="w-full mb-4">
+            {% for message in messages %}
+              <div class="message-box px-4 py-3 rounded-lg text-sm font-medium
+                {% if message.tags == 'error' %}
+                  bg-red-100 text-red-700 border border-red-300
+                {% elif message.tags == 'success' %}
+                  bg-green-100 text-green-700 border border-green-300
+                {% elif message.tags == 'warning' %}
+                  bg-yellow-100 text-yellow-700 border border-yellow-300
+                {% else %}
+                  bg-blue-100 text-blue-700 border border-blue-300
+                {% endif %}
+              ">
+                    {{ message }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
 
              <form method="POST" action="{% url 'edit_address' address.id %}">
               {% csrf_token %}
@@ -167,9 +185,12 @@
                   name='full_name'
                   placeholder="Enter your full name"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
-                  value="{{address.full_name}}"
+                  value="{{ form.full_name.value|default:'' }}"
                   required
                 />
+                {% for error in form.full_name.errors %}
+                      <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
@@ -179,9 +200,12 @@
                   name='phone'
                   placeholder="Enter your mobile number"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
-                  value="{{address.phone}}"
+                  value="{{ form.phone.value|default:'' }}"
                   required
                 />
+                {% for error in form.phone.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
@@ -191,9 +215,12 @@
                   name='address_line'
                   placeholder="Enter House No / Area"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
-                  value="{{address.address_line}}"
+                  value="{{ form.address_line.value|default:'' }}"
                   required
                 />
+                {% for error in form.address_line.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
@@ -203,9 +230,12 @@
                   name='street'
                   placeholder="Enter your Street"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
-                  value="{{address.street}}"
+                  value="{{ form.street.value|default:'' }}"
                   required
                 />
+                {% for error in form.street.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
@@ -215,9 +245,12 @@
                   name='city'
                   placeholder="Enter your City"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
-                  value="{{address.city}}"
+                  value="{{ form.city.value|default:'' }}"
                   required
                 />
+                {% for error in form.city.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
@@ -227,9 +260,12 @@
                   name='state'
                   placeholder="Enter your State"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
-                  value="{{address.state}}"
+                  value="{{ form.state.value|default:'' }}"
                   required
                 />
+                {% for error in form.state.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
@@ -239,9 +275,12 @@
                   name='postal_code'
                   placeholder="Enter your Postal Code"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
-                  value="{{address.postal_code}}"
+                  value="{{ form.postal_code.value|default:'' }}"
                   required
                 />
+                {% for error in form.postal_code.errors %}
+                  <p class="text-red-500 text-sm mt-1">{{ error }}</p>
+                {% endfor %}
               </label>
             </div>
             <div class="px-4">
@@ -319,6 +358,13 @@
         </footer>
       </div>
     </div> 
+
+   <script>
+  setTimeout(() => {
+    const msgs = document.querySelectorAll('.message-box');
+    msgs.forEach(msg => msg.style.display = 'none');
+  }, 5000);
+    </script>
 
   </body>
 </html>

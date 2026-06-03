@@ -1,4 +1,6 @@
 from django.shortcuts import render,redirect,get_object_or_404
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Wishlist
 from products.models import Product
@@ -7,6 +9,9 @@ from decimal import Decimal
 
 # Create your views here.
 
+
+@never_cache
+@login_required
 def wishlist(request):
     categories = Category.objects.filter(is_active=True)
 
@@ -30,7 +35,8 @@ def wishlist(request):
 
     return render(request,'wishlist.html', context)
 
-
+@never_cache
+@login_required
 def add_to_wishlist(request, product_id):
     if not request.user.is_authenticated:
         messages.warning(request,'Please Login First')
@@ -47,7 +53,8 @@ def add_to_wishlist(request, product_id):
 
     return redirect(request.META.get('HTTP_REFERER'))  
 
-
+@never_cache
+@login_required
 def remove_wishlist(request,wishlist_id):
     wishlist_item = get_object_or_404(Wishlist, id=wishlist_id,user=request.user)
     wishlist_item.delete()

@@ -8,11 +8,13 @@ from django.core.files.base import ContentFile
 from django.core.paginator import Paginator
 from django.views.decorators.cache import never_cache
 from django.contrib import messages
+from adminpanel.decorators import admin_required
 
 # Create your views here.
 
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def product_list(request):
     query = request.GET.get('q')
@@ -37,6 +39,7 @@ def product_list(request):
 
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def add_product(request):
 
@@ -102,6 +105,7 @@ def add_product(request):
 
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def edit_product(request,id):
     product = get_object_or_404(Product,id=id)
@@ -152,6 +156,7 @@ def edit_product(request,id):
           })
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def product_details(request,id):
 
@@ -171,6 +176,7 @@ def product_details(request,id):
          })
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login') 
 def add_variant(request,product_id):
      
@@ -195,6 +201,7 @@ def add_variant(request,product_id):
 
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def edit_variant(request, variant_id):
      variant = get_object_or_404(ProductVariant, id=variant_id)
@@ -215,6 +222,7 @@ def edit_variant(request, variant_id):
 
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def delete_variant(request, variant_id):
      variant = get_object_or_404(ProductVariant,id=variant_id)
@@ -224,14 +232,31 @@ def delete_variant(request, variant_id):
      messages.success(request, 'Variant Deleted Successfully.')
      return redirect('products:product_details',id=product_id)
 
+@never_cache
+@admin_required
+@login_required(login_url='admin_login')
+def toggle_listing(request,id):
+     product = get_object_or_404(Product,id=id, is_deleted=False) 
+
+     product.is_listed = not product.is_listed
+     product.save()
+
+     if product.is_listed:
+          messages.success(request, 'Product listed successfully.')
+     else:
+          messages.success(request, 'Product unlisted successfully.')
+
+     return redirect('products:product_list')              
+
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def delete_product(request,id):
      product = get_object_or_404(Product, id=id, is_deleted=False)
      product.is_deleted = True
      product.save()
-     messages.success(request, 'Product Deleted Successfully.')
+     messages.success(request, 'Product moved to trash.')
      return redirect('products:product_list')
 
 
