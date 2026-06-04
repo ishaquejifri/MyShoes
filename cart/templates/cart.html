@@ -138,6 +138,7 @@
             </div>
           </div>
         </header>
+        
         <div class="mt-20">
           <div class="gap-1 px-6 flex flex-1 justify-center py-5">
 
@@ -288,6 +289,18 @@
             <div
               class="layout-content-container flex flex-col max-w-[920px] flex-1"
             >
+            {% if messages %}
+          <div class="fixed top-20 right-5 z-50 space-y-2">
+            {% for message in messages %}
+              <div class="alert-message px-4 py-2 rounded-lg text-white shadow-lg
+                {% if message.tags == 'error' %}bg-red-500{% endif %}
+                {% if message.tags == 'success' %}bg-green-500{% endif %}
+                {% if message.tags == 'info' %}bg-blue-500{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
               <div class="flex flex-wrap justify-between gap-3 p-4">
                 <p
                   class="text-[#0d191b] tracking-light text-[32px] font-bold leading-tight min-w-72"
@@ -432,7 +445,7 @@
                   <p class="text-[#4c8d9a] text-sm font-normal">
                     Estimated Shipping
                   </p>
-                  <p class="text-[#0d191b] text-sm font-normal">Free</p>
+                  <p class="text-[#0d191b] text-sm font-normal">{{ 00.0 }}</p>
                 </div>
               </div>
 
@@ -601,5 +614,19 @@
           });
       }
     </script>
+  <script>
+  setTimeout(() => {
+    const alerts = document.querySelectorAll('.alert-message');
+    alerts.forEach((alert) => {
+      alert.style.transition = 'opacity 0.5s ease';
+      alert.style.opacity = '0';
+      setTimeout(() => {
+        alert.remove();
+      }, 500);
+    });
+  }, 5000); // 5 seconds
+  </script>
+
+
   </body>
 </html>

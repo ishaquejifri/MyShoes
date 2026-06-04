@@ -372,20 +372,15 @@
     <script>
   setTimeout(function () {
     const messageBox = document.getElementById('message-box');
-
     if (messageBox) {
-
       // Smooth fade out
       messageBox.style.transition = "opacity 0.5s ease";
-
       messageBox.style.opacity = "0";
-
       // Remove completely after fade
       setTimeout(() => {
         messageBox.style.display = "none";
       }, 500);
     }
-
   }, 5000); // 5 seconds
 </script>
 

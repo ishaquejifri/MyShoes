@@ -159,7 +159,7 @@ Resend OTP
 
 
             
-            <p class="text-[#6f7673] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline">Didn't receive code? Resend</p>
+           
           </div>
         </div>
         <footer class="flex justify-center">
@@ -247,7 +247,7 @@ function updateTimer() {
     const seconds = Math.floor((distance % 60000) / 1000);
 
     timer.innerHTML =
-        `Resend OTP in ${minutes}:${seconds.toString().padStart(2,'0')}`;
+        `OTP Expiry in ${minutes}:${seconds.toString().padStart(2,'0')}`;
 
     resend.style.display = "none";
 }

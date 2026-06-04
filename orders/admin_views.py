@@ -65,6 +65,7 @@ def admin_order_details(request, order_id):
         'order': order,
         'order_items': order_items,
         'timeline': timeline,
+        'status_choices': order.STATUS_CHOICES,
     }
 
     return render(request, 'admin_order_details.html', context)
@@ -80,16 +81,35 @@ def admin_update_order_status(request, order_id):
         new_status = request.POST.get('status')
 
         valid_status = [
-            'Pending',
-            'Shipped',
-            'Out for Delivery',
-            'Delivered',
-            'Cancelled',
+            'pending',
+            'confirmed',
+            'processing',
+            'shipped',
+            'out_for_delivery',
+            'delivered',
+            'cancelled',
+            'returned',
         ]
  
-        if new_status in valid_status and order.status != new_status:
-            order.status = new_status
+        if new_status in valid_status and order.status.lower() != new_status.lower():
+            # If changing to returned or cancelled, restore stock for items not already cancelled or returned
+            if new_status.lower() in ['cancelled', 'returned']:
+                for item in order.items.all():
+                    if item.item_status.lower() not in ['cancelled', 'returned']:
+                        variant = item.variant
+                        variant.stock += item.quantity
+                        variant.save()
+                        item.item_status = new_status.lower()
+                        item.save()
+
+            order.status = new_status.lower()
             order.save()
+
+            order.items.exclude(
+                item_status__in=['cancelled', 'returned', 'Cancelled', 'Returned']
+            ).update(
+                item_status=new_status.lower()
+            )
 
             OrderStatusHistory.objects.create(
                 order = order,
@@ -98,7 +118,7 @@ def admin_update_order_status(request, order_id):
 
             messages.success(request,'Order status updated successfully')
         else:
-            messages.error(request, 'Invalid or unchanged status.')    
+            messages.error(request, f'Invalid or unchanged status:{new_status}')    
 
     return redirect('admin_order_details', order_id=order.order_id)
 

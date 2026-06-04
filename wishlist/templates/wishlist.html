@@ -120,7 +120,11 @@
     </p>
 
     <p class="text-[#298fa3] text-lg font-bold mt-1">
-      ₹{{ item.product.offer_price }}
+     Base: ₹{{ item.product.base_price }}
+    </p>
+
+    <p class="text-[#298fa3] text-lg font-bold mt-1">
+     Offer: ₹{{ item.product.offer_price }}
     </p>
 
     {% if item.product.total_stock > 0 %} 

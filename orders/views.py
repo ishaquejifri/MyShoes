@@ -33,11 +33,16 @@ def checkout(request):
     addresses = Address.objects.filter(user=request.user)
 
     subtotal = sum(item.subtotal() for item in cart_items)
-    shipping_charge = Decimal('0.00')
+
+    if subtotal >= 5000:
+        shipping_charge = Decimal('0.00')
+    else:
+        shipping_charge = Decimal('40.00')    
+
     total = subtotal + shipping_charge
 
     context = {
-        'categories': categories,
+        'categories': categories,   
         'cart_items': cart_items,
         'addresses': addresses,
         'subtotal': subtotal,
@@ -64,7 +69,7 @@ def place_order(request):
 
     if not address_id:
         messages.error(request,'Please select an address')
-        return request('checkout')
+        return redirect('checkout')
     
     address = get_object_or_404(Address,id=address_id, user=request.user)
 
@@ -157,75 +162,90 @@ def cancel_order(request,order_id):
     categories = Category.objects.filter(is_active=True)
     order = get_object_or_404(Order, order_id=order_id,user=request.user)
 
-    if order.status == 'Delivered':
+    if order.status.lower() == 'delivered':
         messages.error(request,'Delivered orders cannot be cancelled' )
         return redirect('my_orders')
 
-    if order.status == 'Cancelled':
+    if order.status.lower() == 'cancelled':
         messages.warning(request,'Order already cancelled')
         return redirect('my_orders')
     
     if request.method == 'POST':
         reason = request.POST.get('reason')
        
-    #Restore stock
+        #Restore stock
         for item in order.items.all():
-            if item.item_status == 'Cancelled':
+            if item.item_status.lower() not in ['cancelled', 'returned']:
                 variant = item.variant
 
                 variant.stock += item.quantity
                 variant.save()
 
-                item.item_status = 'Cancelled'
+                item.item_status = 'cancelled'
                 item.save()
 
-        order.status = 'Cancelled'
+        order.status = 'cancelled'
         order.cancellation_reason = reason
+        order.update_total()
         order.save()
 
         messages.success(request, 'Order cancelled Successfully')
 
         return redirect('order_details', order_id=order.order_id)
 
-    return render(request,'order_cancel.html', { 'order': order }) 
+    return render(request,'order_cancel.html', {
+         'order': order,
+        'categories': categories, }) 
 
 
 @login_required
-def cancel_order_item(request,item_id):
+def cancel_order_item(request, item_id):
+    order_item = get_object_or_404(
+        OrderItem,
+        id=item_id,
+        order__user=request.user
+    )
 
-    order_item = get_object_or_404(OrderItem,id=item_id,order__user=request.user)
+    if order_item.item_status.lower() in ['cancelled', 'returned', 'delivered']:
+        messages.error(request, "This item cannot be cancelled.")
+        return redirect(
+            'order_details',
+            order_id=order_item.order.order_id
+        )
 
-    if order_item.item_status == 'Delivered':
-        messages.error(request, 'Deilivered item cannot be cancelled')
-        return redirect('my_orders')
+    #cancel the item
+    order_item.item_status = 'cancelled'
+    order_item.save()
 
-    if order_item.item_status == 'Cancelled':
-        messages.warning(request,'Item already cancelled')
-        return redirect('my_orders')
-    
-    #restore stock
+    # Restore stock
     variant = order_item.variant
-
     variant.stock += order_item.quantity
     variant.save()
 
-    #cancel item
-    order_item.item_status = 'Cancelled'
-    order_item.save()
+    remaining_items = order_item.order.items.exclude(
+        item_status__in=['cancelled', 'returned']
+    )
 
-    #check all item cancelled
+    if not remaining_items.exists():
+        order_item.order.status = 'cancelled'
+        order_item.order.save()
+
+    messages.success(request, "Item cancelled successfully.")
+
     order = order_item.order
 
-    active_items = order.items.exclude(item_status='Cancelled')
+    order.update_total()
+    order.refresh_from_db()
 
-    if not active_items.exists():
-        order.item_status = 'Cancelled'
-        order.save()
+    print("New subtotal:", order.sub_total)
+    print("New total:", order.total_amount)
 
-    messages.success(request,'Product cancelled Successfully')
+    return redirect(
+        'order_details',
+        order_id=order_item.order.order_id
+    )
 
-    return redirect('my_orders')
-
+@login_required
 def order_details(request, order_id):
 
     order = get_object_or_404(Order, order_id = order_id, user = request.user)
@@ -243,7 +263,7 @@ def return_order(request, order_id):
 
     order = get_object_or_404(Order, order_id = order_id, user = request.user) 
 
-    if order.status != 'Delivered':
+    if order.status.lower() != 'delivered':
         messages.error(request, 'Only Delivered Items can be returned')
         return redirect('order_details', order_id = order.order_id)  
 
@@ -253,19 +273,20 @@ def return_order(request, order_id):
         # Mandatory reason
         if not reason:
             messages.error(request,'Return reason is required')
-            return redirect('return_order_item', order_id = order.order_id) 
+            return redirect('return_order', order_id = order.order_id) 
         
         # Restore stock
         for item in order.items.all():
-            variant = item.variant
+            if item.item_status.lower() not in ['cancelled', 'returned']:
+                variant = item.variant
 
-            variant.stock += item.quantity
-            variant.save()
+                variant.stock += item.quantity
+                variant.save()
 
-            item.item_status == 'Returned'
-            item.save()
+                item.item_status = 'returned'
+                item.save()
 
-        order.status == 'Returned'
+        order.status = 'returned'
         order.return_reason = reason
         order.save()
 

@@ -159,29 +159,34 @@
 
             <option value="">All Status</option>
 
-            <option value="Pending"
-                {% if request.GET.status == 'pending' %}selected{% endif %}>
+            <option value="pending"
+                {% if request.GET.status|lower == 'pending' %}selected{% endif %}>
                 Pending
             </option>
 
-            <option value="Shipped"
-                {% if request.GET.status == 'Shipped' %}selected{% endif %}>
+            <option value="shipped"
+                {% if request.GET.status|lower == 'shipped' %}selected{% endif %}>
                 Shipped
             </option>
 
-            <option value="Out For Delivery"
-                {% if request.GET.status == 'Out For Delivery' %}selected{% endif %}>
+            <option value="out_for_delivery"
+                {% if request.GET.status|lower == 'out_for_delivery' %}selected{% endif %}>
                 Out For Delivery
             </option>
 
-            <option value="Delivered"
-                {% if request.GET.status == 'Delivered' %}selected{% endif %}>
+            <option value="delivered"
+                {% if request.GET.status|lower == 'delivered' %}selected{% endif %}>
                 Delivered
             </option>
 
-            <option value="Cancelled"
-                {% if request.GET.status == 'Cancelled' %}selected{% endif %}>
+            <option value="cancelled"
+                {% if request.GET.status|lower == 'cancelled' %}selected{% endif %}>
                 Cancelled
+            </option>
+
+            <option value="returned"
+                {% if request.GET.status|lower == 'returned' %}selected{% endif %}>
+                Returned
             </option>
 
         </select>
@@ -263,13 +268,13 @@
                           <span class="
                             px-3 py-1 rounded-full text-sm font-semibold
 
-                            {% if order.status == 'Delivered' %}
+                            {% if order.status|lower == 'delivered' %}
                                 bg-green-100 text-green-700
 
-                            {% elif order.status == 'Cancelled' %}
+                            {% elif order.status|lower == 'cancelled' %}
                                 bg-red-100 text-red-700
 
-                            {% elif order.status == 'Returned' %}
+                            {% elif order.status|lower == 'returned' %}
                                 bg-yellow-100 text-yellow-700
 
                             {% else %}

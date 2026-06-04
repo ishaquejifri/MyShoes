@@ -45,11 +45,33 @@ class Order(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     cancellation_reason = models.TextField(blank=True,null=True)
-    return_reason = models.TextField(blank=True,null=True)
+    return_reason = models.TextField(blank=True,null=True) 
 
     def __str__(self):
         return f"Order #{self.order_id}"
+    
+    def update_total(self):
+        active_items = self.items.exclude(item_status__in=['cancelled', 'returned', 'Cancelled', 'Returned'])
 
+        subtotal = sum(
+        item.price * item.quantity
+        for item in active_items
+    )
+
+        self.sub_total = subtotal
+
+        shipping = self.shipping_charge
+
+        if not active_items.exists():
+            shipping = 0
+
+        self.total_amount = (
+        subtotal +
+        shipping -
+        self.discount_amount
+    )
+
+        self.save()
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name='items')
@@ -79,7 +101,7 @@ class OrderItem(models.Model):
         ('returned','Returned'),
     ]
 
-    item_status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='Placed')
+    item_status = models.CharField(max_length=20,choices=STATUS_CHOICES,default='placed')
 
     def __str__(self):
         return f"{self.product.product_name} - {self.quantity}"
