@@ -33,8 +33,7 @@ def signup(request):
 
         # Empty field validation
         if not all([first_name,last_name,email,phone,password,confirm_password]):
-            messages.error(request,'Every Field Should be Filled')
-            return redirect('signup')
+            return signup_error(request,'Every Field Should be Fillied.')
         
         # First Name Validation
         if len(first_name) < 3 or len(first_name) > 15:
@@ -62,8 +61,7 @@ def signup(request):
             return redirect('signup')    
 
         if User.objects.filter(email=email).exists():
-            messages.error(request,'Email already registered')
-            return redirect('signup')
+            return signup_error(request,'Email already registered.')
         
         # phone validation
         digits_only = re.sub(r'\D','', phone)
@@ -97,18 +95,18 @@ def signup(request):
             messages.error(request, 'Password must be at least 8 characters long.')
             return redirect('signup')
         
-        # if not re.search(r'[a-z]', password):
-        #     messages.error(request, 'Password must contain at least one lowercase letter.')
-        #     return redirect('signup')
-        # if not re.search(r'[A-Z]', password):
-        #     messages.error(request, 'Password must contain at least one uppercase letter.')
-        #     return redirect('signup')
-        # if not re.search(r'[0-9]', password):   
-        #     messages.error(request, 'Password must contain at least one number.')
-        #     return redirect('signup')
-        # if not re.search(r'[@$%&*!?]', password):
-        #     messages.error(request, 'Password must contain at least one special character.')
-        #     return redirect('signup')
+        if not re.search(r'[a-z]', password):
+            messages.error(request, 'Password must contain at least one lowercase letter.')
+            return redirect('signup')
+        if not re.search(r'[A-Z]', password):
+            messages.error(request, 'Password must contain at least one uppercase letter.')
+            return redirect('signup')
+        if not re.search(r'[0-9]', password):   
+            messages.error(request, 'Password must contain at least one number.')
+            return redirect('signup')
+        if not re.search(r'[@$%&*!?]', password):
+            messages.error(request, 'Password must contain at least one special character.')
+            return redirect('signup')
         
         # confirm password check
         if password != confirm_password:
@@ -165,6 +163,10 @@ def signup(request):
         return redirect('verify_otp')
     
     return render(request,'signup.html')
+
+def signup_error(request, message):
+    messages.error(request, message)
+    return render(request, 'signup.html')    
 
 def generate_otp():
     return str(random.randint(100000, 999999))
@@ -346,7 +348,7 @@ def forget_password(request):
         try:
             user = User.objects.get(email=email)
 
-            otp = random.randint(100000,999999)
+            otp = generate_otp()
 
             request.session['reset_email'] = email
             request.session['reset_otp'] = otp
@@ -447,8 +449,14 @@ def profile(request):
 @never_cache
 @login_required(login_url='login')
 def edit_profile(request):
+    categories = Category.objects.filter(is_active=True)
 
     user = request.user
+
+    original_first_name = user.first_name
+    original_last_name = user.last_name
+    original_email = user.email
+    original_phone = user.phone
 
     if request.method == 'POST':
         user.first_name = request.POST.get('first_name', '').strip()
@@ -506,10 +514,10 @@ def edit_profile(request):
             user.profile_image = request.FILES.get('profile_image')
 
         if not request.FILES.get('profile_image') and (
-            user.first_name == request.user.first_name and
-            user.last_name == request.user.last_name and
-            user.email == request.user.email and
-            user.phone == request.user.phone
+            user.first_name == original_first_name and
+            user.last_name == original_last_name and
+            user.email == original_email and
+            user.phone == original_phone
             ):
             messages.info(request, 'No changes detected.')
             return redirect('profile')    
@@ -518,7 +526,7 @@ def edit_profile(request):
         messages.success(request,'Profile Updated successfully') 
         return redirect('profile')   
 
-    return render(request, 'accounts/edit_profile.html', {'user': user})   
+    return render(request, 'accounts/edit_profile.html', {'user': user, 'categories': categories})   
 
 
 @never_cache
@@ -563,15 +571,30 @@ def change_email(request):
             messages.error(request,'Email is required')
             return redirect('change_email')
         
-        otp = random.randint(100000,999999)
+        otp = generate_otp()
 
         request.session['email_otp'] = otp
         request.session['new_email'] = new_mail
+        request.session['email_otp_created_at'] = timezone.now().isoformat()
+
+        message = f''' 
+
+        Hello,
+
+        Your new OTP for Email change is:
+
+        >>>> {otp} <<<<
+
+        This OTP will expire in 2 minutes.
+        Thanks
+        MyShoes
+
+       '''
 
         try:
             send_mail(
-                subject='Your otp for email change',
-                message=f'Your otp is {otp}',
+                subject='Your OTP for Email Change',
+                message=message,
                 from_email=settings.EMAIL_HOST_USER,
                 recipient_list=[new_mail],
                 fail_silently=False,
@@ -591,6 +614,7 @@ def change_email(request):
 @never_cache
 @login_required(login_url='login')
 def email_change_otp(request):
+
     if request.method == "POST":
 
         entered_otp = request.POST.get('otp')
@@ -603,20 +627,74 @@ def email_change_otp(request):
         if not entered_otp:
             messages.error(request,'Enter OTP')
             return redirect('email_change_otp')
+        
+        created_at = request.session.get('email_otp_created_at')
+
+        if created_at:
+            created_at = timezone.datetime.fromisoformat(created_at)
+
+            if timezone.now() > created_at + timedelta(minutes=2):
+                messages.error(request, 'OTP has Expired')
+                return redirect('change_email')
 
         if str(entered_otp) == str(session_otp):
             user = request.user
             user.email = new_email
             user.save()
 
-            request.session.flush()
+            request.session.pop('email_otp', None)
+            request.session.pop('new_email', None)
+            request.session.pop('email_otp_created_at', None)
 
             messages.success(request,'Email updated successfully')
             return redirect('profile')
         else:
             messages.error(request,'Invalid OTP')
+    
+    expiry_time = request.session.get('email_otp_created_at')        
 
-    return render(request,'accounts/email_change_otp.html')
+    return render(request,'accounts/email_change_otp.html',{'otp_expiry': expiry_time})
+
+
+@never_cache
+@login_required
+def resend_email_otp(request):
+
+    new_email = request.session.get('new_email')
+
+    if not new_email:
+        messages.error(request, 'Email session expired.')
+        return redirect('change_email')
+    
+    otp = generate_otp()
+
+    request.session['email_otp'] = otp
+    request.session['email_otp_created_at'] = timezone.now().isoformat()
+
+    message = f''' 
+
+        Hello,
+
+        Your Email change new resend OTP is:
+
+        >>>> {otp} <<<<
+
+        This OTP will expire in 2 minutes.
+        Thanks
+        MyShoes
+
+       '''
+    
+    send_mail(
+        subject='Your OTP for Email Change',
+        message=message,
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[new_email],
+        fail_silently=False,
+    )
+
+    messages.success(request, 'New OTP sent Successfully.')
+    return redirect('email_change_otp')
 
 
 @never_cache

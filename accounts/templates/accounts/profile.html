@@ -1,33 +1,21 @@
 {% if messages %}
 <div id="message-box" class="max-w-md mx-auto mt-4">
   {% for message in messages %} {% if message.tags == 'error' %}
-  <div
-    class="mb-3 px-4 py-3 rounded-md text-sm bg-red-100 text-red-700 border border-red-300"
-  >
+  <div    class="mb-3 px-4 py-3 rounded-md text-sm bg-red-100 text-red-700 border border-red-300"  >
     {{ message }}
   </div>
-
   {% elif message.tags == 'warning' %}
-  <div
-    class="mb-3 px-4 py-3 rounded-md text-sm bg-yellow-100 text-yellow-800 border border-yellow-300"
-  >
+  <div    class="mb-3 px-4 py-3 rounded-md text-sm bg-yellow-100 text-yellow-800 border border-yellow-300"  >
     {{ message }}
   </div>
-
   {% elif message.tags == 'success' %}
-  <div
-    class="mb-3 px-4 py-3 rounded-md text-sm bg-green-100 text-green-700 border border-green-300"
-  >
+  <div    class="mb-3 px-4 py-3 rounded-md text-sm bg-green-100 text-green-700 border border-green-300"  >
     {{ message }}
   </div>
-
   {% else %}
-  <div
-    class="mb-3 px-4 py-3 rounded-md text-sm bg-gray-100 text-gray-700 border border-gray-300"
-  >
+  <div    class="mb-3 px-4 py-3 rounded-md text-sm bg-gray-100 text-gray-700 border border-gray-300"  >
     {{ message }}
   </div>
-
   {% endif %} {% endfor %}
 </div>
 {% endif %}
@@ -120,7 +108,6 @@
                   </div>
                 </button>
               </a>
-
               <!-- CART BUTTON -->
               <a href="{% url 'cart:view_cart'%}">
                 <button
@@ -203,8 +190,7 @@
                     </p>
                   </div>
                   <a href="{% url 'my_orders' %}">
-                  <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f3f4] transition">
-                    
+                  <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f3f4] transition">                    
                     <div
                       class="text-[#121617]"
                       data-icon="Truck"
@@ -222,16 +208,15 @@
                           d="M247.42,117l-14-35A15.93,15.93,0,0,0,218.58,72H184V64a8,8,0,0,0-8-8H24A16,16,0,0,0,8,72V184a16,16,0,0,0,16,16H41a32,32,0,0,0,62,0h50a32,32,0,0,0,62,0h17a16,16,0,0,0,16-16V120A7.94,7.94,0,0,0,247.42,117ZM184,88h34.58l9.6,24H184ZM24,72H168v64H24ZM72,208a16,16,0,1,1,16-16A16,16,0,0,1,72,208Zm81-24H103a32,32,0,0,0-62,0H24V152H168v12.31A32.11,32.11,0,0,0,153,184Zm31,24a16,16,0,1,1,16-16A16,16,0,0,1,184,208Zm48-24H215a32.06,32.06,0,0,0-31-24V128h48Z"
                         ></path>
                       </svg>
-                    </div>
-                  
+                    </div>                  
                     <p
                       class="text-[#121617] text-sm font-medium leading-normal"
                     >
                       My Orders
-                    </p>
-                    
+                    </p>                    
                   </div>
-                </a>
+                  </a>
+                  <a href="{% url 'wishlist' %}">
                   <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f3f4] transition">
                     <div
                       class="text-[#121617]"
@@ -257,6 +242,7 @@
                       Wishlist
                     </p>
                   </div>
+                </a>
                   <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f3f4] transition">
                     <div
                       class="text-[#121617]"
@@ -282,6 +268,7 @@
                       Wallet
                     </p>
                   </div>
+                   <a href="{%url 'my_address'%}">
                   <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f3f4] transition">
                     <div
                       class="text-[#121617]"
@@ -301,14 +288,13 @@
                         ></path>
                       </svg>
                     </div>
-                    <a href="{%url 'my_address'%}">
-                      <p
+                   <p
                         class="text-[#121617] text-sm font-medium leading-normal"
                       >
                         Addresses
-                      </p>
-                    </a>
+                      </p>                    
                   </div>
+                </a>
                 </div>
               </div>
             </div>

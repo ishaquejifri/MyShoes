@@ -6,6 +6,7 @@ from .models import Wishlist
 from products.models import Product
 from category.models import Category
 from decimal import Decimal
+from cart.models import Cart,CartItem
 
 # Create your views here.
 
@@ -51,7 +52,7 @@ def add_to_wishlist(request, product_id):
     else:
         messages.info(request,'Product Already in Wishlist')
 
-    return redirect(request.META.get('HTTP_REFERER'))  
+    return redirect('wishlist')  
 
 @never_cache
 @login_required
@@ -61,5 +62,57 @@ def remove_wishlist(request,wishlist_id):
 
     messages.success(request,'Item Removed from Wishlist')
 
-    return redirect('wishlist')
+    return redirect('wishlist') 
 
+@never_cache
+@login_required
+def clear_wishlist(request):
+    if request.method == 'POST':
+        Wishlist.objects.filter(user=request.user).delete()
+        messages.success(request, 'Wishlist Cleared Successfully.')
+    return redirect('wishlist')    
+
+
+# @never_cache
+# @login_required
+# def move_all_to_cart(request):
+
+#     if request.method == "POST":
+
+#         wishlist_items = Wishlist.objects.filter(
+#             user=request.user
+#         ).select_related('product')
+
+#         cart, created = Cart.objects.get_or_create(
+#             user=request.user
+#         )
+
+#         moved_count = 0
+
+#         for item in wishlist_items:
+
+#             variants = item.product.variants.filter(stock__gt=0)
+
+#             if variants.count() == 1:
+
+#                 variant = variants.first()
+
+#                 cart_item, created = CartItem.objects.get_or_create(
+#                     cart=cart,
+#                     product_variant=variant,
+#                     defaults={'quantity': 1}
+#                 )
+
+#                 if not created:
+#                     cart_item.quantity += 1
+#                     cart_item.save()
+
+#                 item.delete()
+#                 moved_count += 1
+
+#         messages.success(
+#             request,
+#             f"{moved_count} item(s) moved to cart."
+#         )
+
+#     return redirect('wishlist')

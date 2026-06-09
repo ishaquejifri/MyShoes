@@ -119,47 +119,37 @@
             <h1 class="text-[#141515] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 text-center pb-3 pt-5">Verify Your Account</h1>
             <p class="text-[#141515] text-base font-normal leading-normal pb-3 pt-1 px-4 text-center">We've sent a 6-digit code to your email</p>
             
+          <form method="POST">
+              {% csrf_token %}
 
+          <div class="flex justify-center gap-2 py-4">
+            <fieldset class="relative flex gap-3">
+              <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
+              <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
+              <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
+              <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
+              <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
+              <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
+            </fieldset>
+          </div>
+        <!-- Hidden OTP value -->
+        <input type="hidden" name="otp" id="otp_value">
 
-<form method="POST">
-    {% csrf_token %}
-
-<div class="flex justify-center gap-2 py-4">
-  <fieldset class="relative flex gap-3">
-    <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
-    <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
-    <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
-    <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
-    <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
-    <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
-  </fieldset>
-</div>
-
-<!-- Hidden OTP value -->
-<input type="hidden" name="otp" id="otp_value">
-
-<div class="flex px-4 py-3">
-<button type="submit"
-class="flex w-full items-center justify-center rounded-lg h-10 bg-[#1c211f] text-white text-sm font-bold">
-Verify
-</button>
-</div>
-
-</form>
-
-<!-- Timer -->
-<p id="timer" class="text-center text-gray-500 mt-2"></p>
-
-<!-- Resend OTP -->
-<div class="text-center mt-2">
-<a id="resend" href="{% url 'resend_otp' %}" class="text-blue-500 underline" style="display:none;">
-Resend OTP
-</a>
-</div>
-
-
-            
-           
+        <div class="flex px-4 py-3">
+        <button type="submit"
+        class="flex w-full items-center justify-center rounded-lg h-10 bg-[#1c211f] text-white text-sm font-bold">
+        Verify
+        </button>
+        </div>
+        </form>
+        <!-- Timer -->
+        <p id="timer" class="text-center text-gray-500 mt-2"></p>
+        <!-- Resend OTP -->
+        <div class="text-center mt-2">
+        <a id="resend" href="{% url 'resend_otp' %}" class="text-blue-500 underline" style="display:none;">
+        Resend OTP
+        </a>
+        </div>            
           </div>
         </div>
         <footer class="flex justify-center">
@@ -212,51 +202,38 @@ Resend OTP
 /* Combine OTP digits */
 
 document.querySelector("form").addEventListener("submit", function(){
-
 let otp = "";
-
 document.querySelectorAll(".otp-input").forEach(function(input){
 otp += input.value;
 });
-
 document.getElementById("otp_value").value = otp;
-
 });
-
 
 /* Timer */
 
 const timer = document.getElementById("timer");
 const resend = document.getElementById("resend");
-
 const expiryTime =
     new Date("{{ otp_expiry|escapejs }}").getTime() + (2 * 60 * 1000);
-
 function updateTimer() {
-
     const now = new Date().getTime();
     const distance = expiryTime - now;
-
     if (distance <= 0) {
         timer.innerHTML = "OTP Expired";
         resend.style.display = "inline";
         return;
     }
-
     const minutes = Math.floor(distance / 60000);
     const seconds = Math.floor((distance % 60000) / 1000);
-
     timer.innerHTML =
-        `OTP Expiry in ${minutes}:${seconds.toString().padStart(2,'0')}`;
-
+        `OTP Expiry in: ${minutes}:${seconds.toString().padStart(2,'0')}`;
     resend.style.display = "none";
 }
-
 updateTimer();
 setInterval(updateTimer, 1000);
-
 </script>
 
+/* auto focus to next box */
 <script>
   const inputs = document.querySelectorAll(".otp-input");
   const hiddenInput = document.getElementById("otp_value");
@@ -266,7 +243,6 @@ setInterval(updateTimer, 1000);
       if (input.value.length === 1 && index < inputs.length - 1) {
         inputs[index + 1].focus();
       }
-
       // Combine OTP
       let otp = "";
       inputs.forEach(i => otp += i.value);

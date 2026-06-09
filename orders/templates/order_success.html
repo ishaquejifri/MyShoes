@@ -132,10 +132,33 @@
             </div>
           </div>
         </header>
-        <div class="px-40 flex flex-1 justify-center py-5 pt-24">
+        <div class="px-40 flex flex-1 justify-center py-5 pt-24">          
           <div
             class="layout-content-container flex flex-col max-w-[960px] flex-1"
           >
+          {% if messages %}
+               <div id="message-box" class="max-w-md mx-auto mt-4">
+                {% for message in messages %}      
+                  {% if message.tags == 'error' %}
+                  <div class="mb-3 px-4 py-3 rounded-md text-sm bg-red-100 text-red-700 border border-red-300">
+                  {{ message }}
+                  </div>
+                  {% elif message.tags == 'warning' %}
+                  <div class="mb-3 px-4 py-3 rounded-md text-sm bg-yellow-100 text-yellow-800 border border-yellow-300">
+                  {{ message }}
+                  </div>
+                  {% elif message.tags == 'success' %}
+                  <div class="mb-3 px-4 py-3 rounded-md text-sm bg-green-100 text-green-700 border border-green-300">
+                  {{ message }}
+                  </div>
+                  {% else %}
+                 <div class="mb-3 px-4 py-3 rounded-md text-sm bg-gray-100 text-gray-700 border border-gray-300">
+                 {{ message }}
+                 </div>      
+                 {% endif %}
+                {% endfor %}
+               </div>
+              {% endif %}
             <p
               class="text-[#6f7b74] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center"
             >
@@ -329,5 +352,15 @@
         </footer>
       </div>
     </div>
+
+    <script>
+      setTimeout(function () {
+        const messageBox = document.getElementById("message-box");
+        if (messageBox) {
+          messageBox.style.display = "none";
+        }
+      }, 5000); // 5000ms = 5 seconds
+    </script> 
+
   </body>
 </html>

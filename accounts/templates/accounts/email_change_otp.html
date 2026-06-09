@@ -49,17 +49,7 @@
               
             </div>
             <div class="flex gap-2">
-              <button
-                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#edeeed] text-[#141515] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
-              >
-                <div class="text-[#141515]" data-icon="MagnifyingGlass" data-size="20px" data-weight="regular">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                    <path
-                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
-                    ></path>
-                  </svg>
-                </div>
-              </button>
+              
               <button
                 class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#edeeed] text-[#141515] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
               >
@@ -89,38 +79,32 @@
           <div class="flex flex-col w-full max-w-md bg-white p-6 rounded-lg shadow-md">
             {% if messages %}
                <div id="message-box" class="max-w-md mx-auto mt-4">
-                {% for message in messages %}
-      
+                {% for message in messages %}      
                   {% if message.tags == 'error' %}
                   <div class="mb-3 px-4 py-3 rounded-md text-sm bg-red-100 text-red-700 border border-red-300">
                   {{ message }}
                   </div>
-
                   {% elif message.tags == 'warning' %}
                   <div class="mb-3 px-4 py-3 rounded-md text-sm bg-yellow-100 text-yellow-800 border border-yellow-300">
                   {{ message }}
                   </div>
-
                   {% elif message.tags == 'success' %}
                   <div class="mb-3 px-4 py-3 rounded-md text-sm bg-green-100 text-green-700 border border-green-300">
                   {{ message }}
                   </div>
-
                   {% else %}
                  <div class="mb-3 px-4 py-3 rounded-md text-sm bg-gray-100 text-gray-700 border border-gray-300">
                  {{ message }}
-                 </div>
-      
+                 </div>      
                  {% endif %}
-
                 {% endfor %}
                </div>
               {% endif %}
             <h1 class="text-[#141515] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 text-center pb-3 pt-5">Verify Your Email</h1>
             <p class="text-[#141515] text-base font-normal leading-normal pb-3 pt-1 px-4 text-center">We've sent a 6-digit code to your New email</p>
+
             <form method="POST">
                 {% csrf_token %}
-
                 <div class="flex justify-center gap-2 py-4">
                 <fieldset class="relative flex gap-3">
                     <input class="otp-input h-10 w-10 text-center border rounded-md border-gray-300" type="text" maxlength="1">
@@ -132,6 +116,7 @@
                 </fieldset>
                 </div>
             <input type="hidden" name="otp" id="otp_value">
+            <input type="hidden" id="otp-expiry" value="{{ otp_expiry }}">
 
             <div class="flex px-4 py-3">
             <button type="submit"
@@ -140,16 +125,15 @@
         </button>
         </div>
     </form>
-<p id="timer" class="text-center text-gray-500 mt-2"></p>
-
-<!-- Resend OTP -->
-<div class="text-center mt-2">
-<a id="resend" href="#" class="text-blue-500 underline" style="display:none;">
-Resend OTP
-</a>
-</div>
-  <p class="text-[#6f7673] text-sm font-normal leading-normal pb-3 pt-1 px-4 text-center underline">Didn't receive code? Resend</p>
-          </div>
+      
+      <p id="timer" class="text-center text-red-500 mt-2"></p>
+      <!-- Resend OTP -->
+      <div class="text-center mt-2">
+      <a id="resend-link" href="{% url 'resend_email_otp' %}" class="text-blue-500 hidden" >
+      Resend OTP
+      </a>
+      </div>
+            </div>
         </div>
         <footer class="flex justify-center">
           <div class="flex max-w-[960px] flex-1 flex-col">
@@ -198,6 +182,51 @@ Resend OTP
     </div>
 
     <script>
+
+          /* Combine OTP digits */
+
+          document.querySelector("form").addEventListener("submit", function(){
+          let otp = "";
+          document.querySelectorAll(".otp-input").forEach(function(input){
+          otp += input.value;
+          });
+          document.getElementById("otp_value").value = otp;
+          });
+
+          /* Timer */
+
+          const expiryTime = document.getElementById("otp-expiry").value;
+
+            if (expiryTime) {
+
+            const expiryDate = new Date(expiryTime).getTime();
+            const timerElement = document.getElementById("timer");
+
+            const timer = setInterval(() => {
+
+        const now = new Date().getTime();
+        const distance = expiryDate + (2 * 60 * 1000) - now;
+
+        if (distance <= 0) {
+            clearInterval(timer);
+            timerElement.innerHTML = "OTP Expired";
+            document.getElementById("resend-link").classList.remove("hidden");
+
+            return;
+        }
+
+        const minutes = Math.floor(distance / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        
+        timerElement.innerHTML =
+            `OTP Expiry in: ${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+    }, 1000);
+}
+      </script>
+
+    <script>
+      /* Combine OTP digits */
   const inputs = document.querySelectorAll(".otp-input");
   const hiddenInput = document.getElementById("otp_value");
 
@@ -206,7 +235,6 @@ Resend OTP
       if (input.value.length === 1 && index < inputs.length - 1) {
         inputs[index + 1].focus();
       }
-
       // Combine OTP
       let otp = "";
       inputs.forEach(i => otp += i.value);

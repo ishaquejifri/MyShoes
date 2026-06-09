@@ -15,7 +15,7 @@
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   </head>
-  <body>
+  <body>  
     <div
       class="relative flex h-auto min-h-screen w-full flex-col bg-white group/design-root overflow-x-hidden"
       style="--checkbox-tick-svg: url('data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(255,255,255)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e'); font-family: Manrope, &quot;Noto Sans&quot;, sans-serif;"
@@ -106,123 +106,240 @@
   </div>
 {% endif %}
 
-    <form method="POST" action="{% url 'signup'%}">
+    <form method="POST" action="{% url 'signup'%}" id="signup-form" novalidate>
       {% csrf_token %}
 
       <div class="mb-3">
         <label class="block text-sm font-medium mb-1">First Name</label>
         <input
           type="text"
+          id="first_name"
           name="first_name"
-          minlength='3'
-          maxlength='15'
-          pattern='[A-Za-z ]+'
-          title='Only letters and spaces allowed'
+          value="{{ request.POST.first_name|default:'' }}"
           placeholder="Enter your first name"
           class="w-full border border-gray-300 rounded-md h-10 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
         required>
+        <p id="error-first_name" class="text-red-500 text-xs mt-1 hidden"></p>
       </div>
 
       <div class="mb-3">
         <label class="block text-sm font-medium mb-1">Last Name</label>
         <input
           type="text"
+          id="last_name"
           name="last_name"
-          minlength="3"
-          maxlength="15"
-          pattern="[A-Za-z ]+"
-          title="Only letters and spaces allowed"
+          value="{{ request.POST.last_name|default:'' }}"
           placeholder="Enter your last name"
           class="w-full border border-gray-300 rounded-md h-10 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
         required>
+        <p id="error-last_name" class="text-red-500 text-xs mt-1 hidden"></p>
       </div>
 
       <div class="mb-3">
         <label class="block text-sm font-medium mb-1">Email</label>
         <input
           type="email"
+          id="email"
           name="email"
+          value="{{ request.POST.email|default:'' }}"
           placeholder="Enter your email"
           class="w-full border border-gray-300 rounded-md h-10 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
         required>
+        <p id="error-email" class="text-red-500 text-xs mt-1 hidden"></p>
       </div>
 
       <div class="mb-3">
         <label class="block text-sm font-medium mb-1">Phone Number</label>
         <input
           type="text"
+          id="phone"
           name="phone"
-          pattern="[0-9]{10}"
-          maxlength="10"
-          minlength="10"
-          title="Enter a valid 10 digit phone number"
+          value="{{ request.POST.phone|default:'' }}"
           placeholder="Enter your phone number"
           class="w-full border border-gray-300 rounded-md h-10 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
         required>
+        <p id="error-phone" class="text-red-500 text-xs mt-1 hidden"></p>
       </div>
-<div class="mb-3">
-  <label class="block text-sm font-medium mb-1">Password</label>
 
-  <div class="relative">
-    <input
-      type="password"
-      id="password"
-      name="password"
-      minlength='8'
-      placeholder="Enter your password"
-      class="w-full border border-gray-300 rounded-md h-10 px-3 pr-10 focus:outline-none focus:ring-1 focus:ring-gray-400"
-    required>
+      <div class="mb-3">
+        <label class="block text-sm font-medium mb-1">Password</label>
+        <div class="relative">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            class="w-full border border-gray-300 rounded-md h-10 px-3 pr-10 focus:outline-none focus:ring-1 focus:ring-gray-400"
+          required>
+          <button
+            type="button"
+            onclick="togglePassword('password')"
+            class="absolute right-2 top-2 text-gray-500"
+          >
+            👁
+          </button>
+        </div>
+        <p id="error-password" class="text-red-500 text-xs mt-1 hidden"></p>
+      </div>
 
-    <button
-      type="button"
-      onclick="togglePassword('password')"
-      class="absolute right-2 top-2 text-gray-500"
-    >
-      👁
-    </button>
-  </div>
-</div>
+      <div class="mb-3">
+        <label class="block text-sm font-medium mb-1">Confirm Password</label>
+        <div class="relative">
+          <input
+            type="password"
+            id="confirm_password"
+            name="confirm_password"
+            placeholder="Confirm your password"
+            class="w-full border border-gray-300 rounded-md h-10 px-3 pr-10 focus:outline-none focus:ring-1 focus:ring-gray-400"
+          required>
+          <button
+            type="button"
+            onclick="togglePassword('confirm_password')"
+            class="absolute right-2 top-2 text-gray-500"
+          >
+            👁
+          </button>
+        </div>
+        <p id="error-confirm_password" class="text-red-500 text-xs mt-1 hidden"></p>
+      </div>
 
+      <script>
+      function togglePassword(fieldId) {
+        const passwordField = document.getElementById(fieldId);
+        if (passwordField.type === "password") {
+          passwordField.type = "text";
+        } else {
+          passwordField.type = "password";
+        }
+      }
 
-<div class="mb-3">
-  <label class="block text-sm font-medium mb-1">Confirm Password</label>
+      document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById("signup-form");
+        const fields = {
+          first_name: {
+            el: document.getElementById("first_name"),
+            err: document.getElementById("error-first_name"),
+            validate: (val) => {
+              const trimmed = val.trim();
+              if (!trimmed) return "First name is required.";
+              if (trimmed.length < 3 || trimmed.length > 15) return "First name must be between 3 and 15 characters.";
+              if (!/^[A-Za-z ]+$/.test(trimmed)) return "First name should contain only letters and spaces.";
+              return "";
+            }
+          },
+          last_name: {
+            el: document.getElementById("last_name"),
+            err: document.getElementById("error-last_name"),
+            validate: (val) => {
+              const trimmed = val.trim();
+              if (!trimmed) return "Last name is required.";
+              if (trimmed.length < 3 || trimmed.length > 15) return "Last name must be between 3 and 15 characters.";
+              if (!/^[A-Za-z ]+$/.test(trimmed)) return "Last name should contain only letters and spaces.";
+              return "";
+            }
+          },
+          email: {
+            el: document.getElementById("email"),
+            err: document.getElementById("error-email"),
+            validate: (val) => {
+              const trimmed = val.trim();
+              if (!trimmed) return "Email is required.";
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              if (!emailRegex.test(trimmed)) return "Please enter a valid email address.";
+              return "";
+            }
+          },
+          phone: {
+            el: document.getElementById("phone"),
+            err: document.getElementById("error-phone"),
+            validate: (val) => {
+              const trimmed = val.trim();
+              if (!trimmed) return "Phone number is required.";
+              const digits = trimmed.replace(/\D/g, '');
+              if (digits.length !== 10) return "Phone number must contain exactly 10 digits.";
+              if (/^(\d)\1{9}$/.test(digits)) return "Invalid phone number (cannot be all same digits).";
+              const sequentialPatterns = ['1234567890', '0123456789', '9876543210', '0987654321'];
+              if (sequentialPatterns.includes(digits)) return "Enter a valid phone number.";
+              return "";
+            }
+          },
+          password: {
+            el: document.getElementById("password"),
+            err: document.getElementById("error-password"),
+            validate: (val) => {
+              if (!val) return "Password is required.";
+              if (val.length < 8) return "Password must be at least 8 characters long.";
+              if (!/[a-z]/.test(val)) return "Password must contain at least one lowercase letter.";
+              if (!/[A-Z]/.test(val)) return "Password must contain at least one uppercase letter.";
+              if (!/[0-9]/.test(val)) return "Password must contain at least one number.";
+              if (!/[@$%&*!?]/.test(val)) return "Password must contain at least one special character.";
+              return "";
+            }
+          },
+          confirm_password: {
+            el: document.getElementById("confirm_password"),
+            err: document.getElementById("error-confirm_password"),
+            validate: (val) => {
+              if (!val) return "Confirm password is required.";
+              const passwordVal = document.getElementById("password").value;
+              if (val !== passwordVal) return "Passwords do not match.";
+              return "";
+            }
+          }
+        };
 
-  <div class="relative">
-    <input
-      type="password"
-      id="confirm_password"
-      name="confirm_password"
-      placeholder="Confirm your password"
-      class="w-full border border-gray-300 rounded-md h-10 px-3 pr-10 focus:outline-none focus:ring-1 focus:ring-gray-400"
-    required>
+        function validateField(name) {
+          const field = fields[name];
+          if (!field) return true;
+          const errorMsg = field.validate(field.el.value);
+          if (errorMsg) {
+            field.err.textContent = errorMsg;
+            field.err.classList.remove("hidden");
+            field.el.classList.add("border-red-500", "focus:ring-red-400");
+            field.el.classList.remove("border-gray-300", "focus:ring-gray-400");
+            return false;
+          } else {
+            field.err.textContent = "";
+            field.err.classList.add("hidden");
+            field.el.classList.remove("border-red-500", "focus:ring-red-400");
+            field.el.classList.add("border-gray-300", "focus:ring-gray-400");
+            return true;
+          }
+        }
 
-    <button
-      type="button"
-      onclick="togglePassword('confirm_password')"
-      class="absolute right-2 top-2 text-gray-500"
-    >
-      👁
-    </button>
-  </div>
-</div>
+        Object.keys(fields).forEach(name => {
+          const field = fields[name];
+          field.el.addEventListener("blur", () => validateField(name));
+          field.el.addEventListener("input", () => {
+            if (!field.err.classList.contains("hidden")) {
+              validateField(name);
+            }
+          });
+        });
 
+        form.addEventListener("submit", function(e) {
+          let isValid = true;
+          let firstInvalidField = null;
 
-<script>
-function togglePassword(fieldId) {
-  const passwordField = document.getElementById(fieldId);
-
-  if (passwordField.type === "password") {
-    passwordField.type = "text";
-  } else {
-    passwordField.type = "password";
-  }
-}
-</script>
-   
-
-     
-
-      <button
+          Object.keys(fields).forEach(name => {
+            const fieldValid = validateField(name);
+            if (!fieldValid) {
+              isValid = false;
+              if (!firstInvalidField) {
+                firstInvalidField = fields[name].el;
+              }
+            }
+          });
+          if (!isValid) {
+            e.preventDefault();
+            if (firstInvalidField) {
+              firstInvalidField.focus();
+            }
+          }
+        });
+      });
+      </script>
+         <button
         type="submit"
         class="w-full bg-[#222f2e] text-white h-10 rounded-md font-semibold"
       >

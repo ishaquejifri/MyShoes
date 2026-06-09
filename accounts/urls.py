@@ -15,6 +15,7 @@ urlpatterns = [
     path('change-password/',views.change_password,name='change_password'),
     path('change-email/',views.change_email,name='change_email'),
     path('email-change-otp/',views.email_change_otp,name='email_change_otp'),
+    path('resend-email-otp',views.resend_email_otp,name='resend_email_otp'),
     path('my-address/',views.my_address,name='my_address'),
     path('add-address/',views.add_address,name='add_address'),
     path('edit-address/<int:id>/',views.edit_address,name='edit_address'),

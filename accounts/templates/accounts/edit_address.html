@@ -174,7 +174,7 @@
               </div>
             {% endif %}
 
-             <form method="POST" action="{% url 'edit_address' address.id %}">
+             <form method="POST" action="{% url 'edit_address' address.id %}" id="edit-address-form" novalidate>
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ next }}">
             <div class="flex flex-wrap justify-between gap-3 p-4"><p class="text-[#121717] tracking-light text-[32px] font-bold leading-tight min-w-72">Edit Address</p></div>
@@ -182,6 +182,7 @@
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-[#121717] text-base font-medium leading-normal pb-2">Full Name</p>
                 <input
+                  id='full_name'
                   name='full_name'
                   placeholder="Enter your full name"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
@@ -191,12 +192,14 @@
                 {% for error in form.full_name.errors %}
                       <p class="text-red-500 text-sm mt-1">{{ error }}</p>
                 {% endfor %}
+                <p id="error-full_name" class="text-red-500 text-xs mt-1 hidden"></p>
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-[#121717] text-base font-medium leading-normal pb-2">Mobile Number</p>
                 <input
+                  id='phone'
                   name='phone'
                   placeholder="Enter your mobile number"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
@@ -206,12 +209,14 @@
                 {% for error in form.phone.errors %}
                   <p class="text-red-500 text-sm mt-1">{{ error }}</p>
                 {% endfor %}
+                <p id="error-phone" class="text-red-500 text-xs mt-1 hidden"></p>
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-[#121717] text-base font-medium leading-normal pb-2">Address Line</p>
                 <input
+                  id='address_line'
                   name='address_line'
                   placeholder="Enter House No / Area"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
@@ -221,12 +226,14 @@
                 {% for error in form.address_line.errors %}
                   <p class="text-red-500 text-sm mt-1">{{ error }}</p>
                 {% endfor %}
+                <p id="error-address_line" class="text-red-500 text-xs mt-1 hidden"></p>
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-[#121717] text-base font-medium leading-normal pb-2">Street</p>
                 <input
+                  id='street'
                   name='street'
                   placeholder="Enter your Street"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
@@ -236,12 +243,14 @@
                 {% for error in form.street.errors %}
                   <p class="text-red-500 text-sm mt-1">{{ error }}</p>
                 {% endfor %}
+                <p id="error-street" class="text-red-500 text-xs mt-1 hidden"></p>
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-[#121717] text-base font-medium leading-normal pb-2">City</p>
                 <input
+                  id='city'
                   name='city'
                   placeholder="Enter your City"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
@@ -251,12 +260,14 @@
                 {% for error in form.city.errors %}
                   <p class="text-red-500 text-sm mt-1">{{ error }}</p>
                 {% endfor %}
+                <p id="error-city" class="text-red-500 text-xs mt-1 hidden"></p>
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-[#121717] text-base font-medium leading-normal pb-2">State</p>
                 <input
+                  id='state'
                   name='state'
                   placeholder="Enter your State"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
@@ -266,12 +277,14 @@
                 {% for error in form.state.errors %}
                   <p class="text-red-500 text-sm mt-1">{{ error }}</p>
                 {% endfor %}
+                <p id="error-state" class="text-red-500 text-xs mt-1 hidden"></p>
               </label>
             </div>
             <div class="flex max-w-[480px] flex-wrap items-end gap-4 px-4 py-3">
               <label class="flex flex-col min-w-40 flex-1">
                 <p class="text-[#121717] text-base font-medium leading-normal pb-2">Postal Code</p>
                 <input
+                  id='postal_code'
                   name='postal_code'
                   placeholder="Enter your Postal Code"
                   class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-[#121717] focus:outline-0 focus:ring-0 border border-[#dde4e4] bg-white focus:border-[#dde4e4] h-14 placeholder:text-[#678383] p-[15px] text-base font-normal leading-normal"
@@ -281,8 +294,140 @@
                 {% for error in form.postal_code.errors %}
                   <p class="text-red-500 text-sm mt-1">{{ error }}</p>
                 {% endfor %}
+                <p id="error-postal_code" class="text-red-500 text-xs mt-1 hidden"></p>
               </label>
             </div>
+
+            <script>
+            document.addEventListener("DOMContentLoaded", function() {
+              const form = document.getElementById("edit-address-form");
+              const fields = {
+                full_name: {
+                  el: document.getElementById("full_name"),
+                  err: document.getElementById("error-full_name"),
+                  validate: (val) => {
+                    const trimmed = val.trim();
+                    if (!trimmed) return "Full name is required.";
+                    if (trimmed.length < 3) return "Full name must be at least 3 characters long.";
+                    if (!/^[A-Za-z ]+$/.test(trimmed)) return "Full name should contain only letters and spaces.";
+                    return "";
+                  }
+                },
+                phone: {
+                  el: document.getElementById("phone"),
+                  err: document.getElementById("error-phone"),
+                  validate: (val) => {
+                    const trimmed = val.trim();
+                    if (!trimmed) return "Phone number is required.";
+                    if (!/^\d{10}$/.test(trimmed)) return "Phone number must contain exactly 10 digits.";
+                    if (/^(\d)\1{9}$/.test(trimmed)) return "Invalid phone number.";
+                    return "";
+                  }
+                },
+                address_line: {
+                  el: document.getElementById("address_line"),
+                  err: document.getElementById("error-address_line"),
+                  validate: (val) => {
+                    const trimmed = val.trim();
+                    if (!trimmed) return "Address is required.";
+                    if (trimmed.length < 5) return "Enter a complete address.";
+                    return "";
+                  }
+                },
+                street: {
+                  el: document.getElementById("street"),
+                  err: document.getElementById("error-street"),
+                  validate: (val) => {
+                    const trimmed = val.trim();
+                    if (!trimmed) return "Street is required.";
+                    if (trimmed.length < 3) return "Street name is too short.";
+                    return "";
+                  }
+                },
+                city: {
+                  el: document.getElementById("city"),
+                  err: document.getElementById("error-city"),
+                  validate: (val) => {
+                    const trimmed = val.trim();
+                    if (!trimmed) return "City is required.";
+                    if (!/^[A-Za-z ]+$/.test(trimmed)) return "City should contain only letters.";
+                    return "";
+                  }
+                },
+                state: {
+                  el: document.getElementById("state"),
+                  err: document.getElementById("error-state"),
+                  validate: (val) => {
+                    const trimmed = val.trim();
+                    if (!trimmed) return "State is required.";
+                    if (!/^[A-Za-z ]+$/.test(trimmed)) return "State should contain only letters.";
+                    return "";
+                  }
+                },
+                postal_code: {
+                  el: document.getElementById("postal_code"),
+                  err: document.getElementById("error-postal_code"),
+                  validate: (val) => {
+                    const trimmed = val.trim();
+                    if (!trimmed) return "Postal code is required.";
+                    if (!/^\d{6}$/.test(trimmed)) return "Pincode must contain exactly 6 digits.";
+                    return "";
+                  }
+                }
+              };
+
+              function validateField(name) {
+                const field = fields[name];
+                if (!field) return true;
+                const errorMsg = field.validate(field.el.value);
+                if (errorMsg) {
+                  field.err.textContent = errorMsg;
+                  field.err.classList.remove("hidden");
+                  field.el.classList.add("border-red-500", "focus:ring-red-400");
+                  field.el.classList.remove("border-[#dde4e4]");
+                  return false;
+                } else {
+                  field.err.textContent = "";
+                  field.err.classList.add("hidden");
+                  field.el.classList.remove("border-red-500", "focus:ring-red-400");
+                  field.el.classList.add("border-[#dde4e4]");
+                  return true;
+                }
+              }
+
+              Object.keys(fields).forEach(name => {
+                const field = fields[name];
+                field.el.addEventListener("blur", () => validateField(name));
+                field.el.addEventListener("input", () => {
+                  if (!field.err.classList.contains("hidden")) {
+                    validateField(name);
+                  }
+                });
+              });
+
+              form.addEventListener("submit", function(e) {
+                let isValid = true;
+                let firstInvalidField = null;
+
+                Object.keys(fields).forEach(name => {
+                  const fieldValid = validateField(name);
+                  if (!fieldValid) {
+                    isValid = false;
+                    if (!firstInvalidField) {
+                      firstInvalidField = fields[name].el;
+                    }
+                  }
+                });
+
+                if (!isValid) {
+                  e.preventDefault();
+                  if (firstInvalidField) {
+                    firstInvalidField.focus();
+                  }
+                }
+              });
+            });
+            </script>
             <div class="px-4">
               <label class="flex gap-x-3 py-3 flex-row">
                 <input

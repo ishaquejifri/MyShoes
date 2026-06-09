@@ -102,6 +102,7 @@
             <div class="flex h-full min-h-[700px] flex-col justify-between bg-white p-4">
               <div class="flex flex-col gap-4">
                 <div class="flex flex-col gap-2">
+                  <a href="{% url 'profile' %}">
                   <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f4f4] transition">
                     <div class="text-[#111718]" data-icon="User" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
@@ -110,8 +111,10 @@
                         ></path>
                       </svg>
                     </div>
-                    <p class="text-[#111718] text-sm font-medium leading-normal">Profile Info</p>
+                    <p class="text-[#111718] text-sm font-medium leading-normal">Profile</p>
                   </div>
+                </a>
+                <a href="#">
                   <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f4f4] transition">
                     <div class="text-[#111718]" data-icon="Truck" data-size="24px" data-weight="fill">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
@@ -122,6 +125,8 @@
                     </div>
                     <p class="text-[#111718] text-sm font-medium leading-normal">My Orders</p>
                   </div>
+                </a>
+                <a href="{% url 'wishlist' %}">
                   <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f4f4] transition">
                     <div class="text-[#111718]" data-icon="Heart" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
@@ -132,31 +137,20 @@
                     </div>
                     <p class="text-[#111718] text-sm font-medium leading-normal">Wishlist</p>
                   </div>
+                </a>
+                <a href="#">
                   <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f3f4] transition">
-                    <div
-                      class="text-[#121617]"
-                      data-icon="CreditCard"
-                      data-size="24px"
-                      data-weight="regular"
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="24px"
-                        height="24px"
-                        fill="currentColor"
-                        viewBox="0 0 256 256"
-                      >
+                    <div class="text-[#121617]" data-icon="CreditCard" data-size="24px" data-weight="regular">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
                         <path
                           d="M224,48H32A16,16,0,0,0,16,64V192a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V64A16,16,0,0,0,224,48Zm0,16V88H32V64Zm0,128H32V104H224v88Zm-16-24a8,8,0,0,1-8,8H168a8,8,0,0,1,0-16h32A8,8,0,0,1,208,168Zm-64,0a8,8,0,0,1-8,8H120a8,8,0,0,1,0-16h16A8,8,0,0,1,144,168Z"
                         ></path>
                       </svg>
                     </div>
-                    <p
-                      class="text-[#121617] text-sm font-medium leading-normal"
-                    >
-                      Wallet
-                    </p>
+                    <p class="text-[#121617] text-sm font-medium leading-normal">Wallet</p>
                   </div>
+                </a>
+                <a href="{% url 'my_address' %}">
                   <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f4f4] transition">
                     <div class="text-[#111718]" data-icon="MapPin" data-size="24px" data-weight="regular">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
@@ -167,6 +161,7 @@
                     </div>
                     <p class="text-[#111718] text-sm font-medium leading-normal">Addresses</p>
                   </div>
+                </a>
                 </div>
               </div>
             </div>

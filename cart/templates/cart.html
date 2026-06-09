@@ -177,6 +177,7 @@
                     </p>
                   </a>
                   </div>
+                  <a href="{% url 'my_orders' %}">
                   <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f3f4] transition">
                     <div
                       class="text-[#121617]"
@@ -202,6 +203,7 @@
                       My Orders
                     </p>
                   </div>
+                </a>
                   <a href="{% url 'wishlist' %}">
                   <div class="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-[#f4f3f4] transition">
                     <div
@@ -308,7 +310,6 @@
                   Shopping Cart
                 </p>
               </div>
-
               {% for item in cart_items %}
               <div
                 class="flex items-center gap-4 bg-[#f8fbfc] px-4 min-h-[90px] py-3 justify-between border-b border-[#e8eef2]"
@@ -319,7 +320,6 @@
                     class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-16"
                     style="background-image: url('{{ item.product.image.url }}');"
                   ></div>
-
                   <div class="flex flex-col justify-center">
                     <p
                       class="text-[#0d191b] text-base font-medium leading-normal"
@@ -343,7 +343,6 @@
                   <p>Size: {{ item.variant.size }}</p>
                   <p>Color: {{ item.variant.color }}</p>
                 </div>
-
                 <!-- Quantity Controls -->
                 <div class="flex items-center gap-3">
                   <button

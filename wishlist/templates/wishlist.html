@@ -77,7 +77,8 @@
             </a>
             </div>
           </div>
-        </header>
+        </header>  
+                
         
             {% if messages %}
           <div class="fixed top-20 right-5 z-50 space-y-2">
@@ -91,18 +92,39 @@
             {% endfor %}
           </div>
         {% endif %}
-
         <div class="gap-1 px-6 flex flex-1 justify-center py-5 pt-24">
+          <div class="bg-white rounded-xl shadow-sm p-5 sticky top-24">
+    <div class="space-y-2">
+    {% for item in wishlist_items|slice:":5" %}
+        <div class="flex justify-between text-sm">
+            <span>{{ item.product.product_name|truncatechars:20 }}</span>
+
+            {% if item.product.total_stock > 0 %}
+                <span class="text-green-600">✓</span>
+            {% else %}
+                <span class="text-red-500">✕</span>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+    
+
+    <a href="{% url 'user_product_list' %}"
+       class="mt-6 flex items-center justify-center rounded-lg h-11 bg-[#298fa3] text-white font-semibold">
+        Continue Shopping
+    </a>
+</div>
           <div class="layout-content-container flex flex-col max-w-[920px] flex-1">
-            <div class="flex flex-wrap justify-between gap-3 p-4"><p class="text-[#101819] tracking-light text-[32px] font-bold leading-tight min-w-72">My Wishlist</p></div>
+            
+            <div class="flex flex-wrap justify-between gap-3 p-4"><p class="text-[#101819] tracking-light text-[32px] font-bold leading-tight min-w-72">My Wishlist</p>
+            </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-
+              
   {% if wishlist_items %}
-
+  
     {% for item in wishlist_items %}
-
+    
       <div class="bg-white rounded-xl shadow-sm p-3 flex flex-col h-[420px]">
-
   <!-- Product Image -->
   <div class="w-full h-52 overflow-hidden rounded-lg bg-gray-100">
     <img
@@ -111,22 +133,17 @@
       class="w-full h-full object-cover"
     />
   </div>
-
   <!-- Product Details -->
-  <div class="mt-3 flex-1 flex flex-col">
-    
+  <div class="mt-3 flex-1 flex flex-col">    
     <p class="text-[#101819] text-base font-semibold line-clamp-1">
       {{ item.product.product_name }}
     </p>
-
     <p class="text-[#298fa3] text-lg font-bold mt-1">
      Base: ₹{{ item.product.base_price }}
     </p>
-
     <p class="text-[#298fa3] text-lg font-bold mt-1">
      Offer: ₹{{ item.product.offer_price }}
     </p>
-
     {% if item.product.total_stock > 0 %} 
       <p class="text-green-600 text-sm font-medium mt-1">
         In Stock
@@ -136,21 +153,15 @@
         Out of Stock
       </p>
     {% endif %}
-
     <!-- Variant Selection -->
     <form method="POST"
       action="{% url 'cart:add_to_cart' item.product.id %}"
       class="flex-1">
-
     {% csrf_token %}
-
     <input type="hidden" name="from_wishlist" value="true">
-
     <select name="variant_id"
       class="w-full mb-2 rounded-lg border border-gray-300 p-2 text-sm">
-
       <option value="">Size & Color</option>
-
       {% for variant in item.product.variants.all %}
         {% if variant.stock > 0 %}
           <option value="{{ variant.id }}">
@@ -159,76 +170,60 @@
         {% endif %}
       {% endfor %}
     </select>
-
     <button type="submit"
       class="w-full flex items-center justify-center rounded-lg h-10 px-4 bg-[#298fa3] text-white text-sm font-bold">
-
       Add to Cart
+    </button>   
+</form> 
+<form method="POST"
+      action="{% url 'remove_wishlist' item.id %}"
+      class="mt-2">
+    {% csrf_token %}
+    <button
+        type="submit"
+        class="w-full flex items-center justify-center rounded-lg h-10 px-4 border border-red-300 text-red-500 text-sm font-semibold hover:bg-red-50"
+        onclick="return confirm('Remove this item from wishlist?')">
+        Remove
     </button>
-    
-
-</form>
-
-       
-
-
-
-    
-
+</form>  
   </div>
 </div>
-
     {% endfor %}
-
   {% else %}
-
     <div class="col-span-full flex flex-col items-center justify-center py-20">
-
       <h2 class="text-2xl font-bold text-[#101819] mb-3">
         Your Wishlist is Empty
       </h2>
-
       <p class="text-[#57858e] mb-6">
         Save your favorite shoes here.
       </p>
-
       <a href="{% url 'user_product_list' %}"
         class="bg-[#298fa3] text-white px-6 py-3 rounded-lg font-semibold">
-
         Continue Shopping
       </a>
-
     </div>
-
   {% endif %}
-
-</div>
-            
-          </div>
-          <div class="layout-content-container flex flex-col w-[360px]">
-            <h3 class="text-[#101819] text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-4">Wishlist Summary</h3>
-            <div class="p-4 grid grid-cols-[20%_1fr] gap-x-6">
-              <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#d3e1e4] py-5">
-                <p class="text-[#57858e] text-sm font-normal leading-normal">Items</p>
-                <p class="text-[#101819] text-sm font-normal leading-normal">
-                   {{ wishlist_items.count }}
-                </p>
-              </div>
-              <div class="col-span-2 grid grid-cols-subgrid border-t border-t-[#d3e1e4] py-5">
-                <p class="text-[#57858e] text-sm font-normal leading-normal">Total</p>
-                <p class="text-[#101819] text-sm font-normal leading-normal">₹{{ total_price }}</p>
-              </div>
-            </div>
-            <div class="flex px-4 py-3">
-              <a href="{% url 'cart:view_cart'%}">
-              <button
-                class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 px-5 flex-1 bg-[#298fa3] text-[#f9fbfb] text-base font-bold leading-normal tracking-[0.015em]"
-              >
-                <span class="truncate">View Cart</span>
-              </button>
-            </a>
-            </div>
-          </div>
+</div>            
+  </div>
+       <form method="POST" action="{% url 'clear_wishlist' %}">
+    {% csrf_token %}
+    <button
+        type="submit"
+        {% if not wishlist_items %}
+            disabled
+        {% endif %}
+        class="w-full h-11 rounded-lg border border-red-300 font-semibold
+               {% if wishlist_items %}
+                   text-red-500 hover:bg-red-50
+               {% else %}
+                   text-gray-400 border-gray-200 bg-gray-100 cursor-not-allowed
+               {% endif %}"
+        onclick="return confirm('Clear your entire wishlist?')"
+    >
+        Clear Wishlist
+    </button>
+</form>
+         </div>
         </div>
         <footer class="flex justify-center">
           <div class="flex max-w-[960px] flex-1 flex-col">
