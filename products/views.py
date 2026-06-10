@@ -125,20 +125,37 @@ def edit_product(request,id):
 
             updated_product.save()
 
-            variant_ids = request.POST.getlist('variant_id')
+            variant_ids = request.POST.getlist('variant_id')            
+
+            for img in updated_product.images.all():
+
+               new_image = request.FILES.get(
+                     f'gallery_image_{img.id}'
+                    )
+
+               if new_image:
+                    img.image = new_image
+                    img.save()
             
+            delete_ids = request.POST.getlist(
+               'delete_gallery_images'  
+            )
 
-            gallery_images = request.FILES.getlist('gallery_images')
+            if delete_ids:
+                 ProductImage.objects.filter(
+                      id__in=delete_ids,
+                      product=updated_product
+                 ).delete()
 
-            if gallery_images:
-                 updated_product.images.all().delete()
+            new_images = request.FILES.getlist(
+                 'new_gallery_images'
+            )
 
-                 for image in gallery_images:
-                    ProductImage.objects.create(
+            for image in new_images:
+                 ProductImage.objects.create(
                       product=updated_product,
-                      image = image
-
-                 )
+                      image=image
+                 )                   
 
             messages.success(request, 'Product Edited Successfully.')   
             return redirect('products:product_list')

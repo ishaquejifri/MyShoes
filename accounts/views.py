@@ -275,6 +275,7 @@ def resend_otp(request):
     message = f''' 
 
         Hello,
+        Thank you for using MyShoes.
 
         Your new OTP is:
 
@@ -362,9 +363,9 @@ def forget_password(request):
 
                     Your OTP is:
 
-                    {otp}
+                    >>>>{otp}<<<<
 
-                    This OTP will expire in 5 minutes.
+                    This OTP will expire in 2 minutes.
 
                     If you did not request a password reset, please ignore this email.
 
