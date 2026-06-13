@@ -321,7 +321,7 @@ def user_login(request):
         else:
             messages.error(request,'invalid email or password')  
        
-    return render(request,'login.html')        
+    return render(request,'login.html')         
 
 def logout_view(request):
     logout(request)

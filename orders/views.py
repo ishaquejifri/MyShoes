@@ -355,8 +355,8 @@ def download_invoice(request, order_id):
             item.product_name,
             f"{item.variant_size} / {item.variant_color}",
             str(item.quantity),
-            f"₹{price}",
-            f"₹{total_price}",
+            f"Rs {price}",
+            f"Rs {total_price}",
         ])
 
     # GRAND TOTAL
@@ -365,7 +365,7 @@ def download_invoice(request, order_id):
         '',
         '',
         'Grand Total',
-        f"₹{order.total_amount}"
+        f"Rs {order.total_amount}"
     ])
 
     table = Table(data, colWidths=[170, 120, 60, 80, 80])
