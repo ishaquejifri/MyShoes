@@ -9,7 +9,6 @@ class ProductForm(forms.ModelForm):
             'product_name',
             'slug',
             'base_price',
-            'stock',
             'description',
             'category',
             'image',

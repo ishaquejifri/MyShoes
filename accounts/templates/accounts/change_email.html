@@ -57,49 +57,23 @@
                 ></path>
               </svg>
             </div>
+            <a href="{% url 'home' %}">
             <h2 class="text-lg font-bold">Lotto Shoes</h2>
+            </a>
           </div>
           <div class="flex flex-1 justify-end gap-8">
             <div class="flex items-center gap-9">
+               {% for category in categories %}
               <a
+                href="{% url 'user_product_list' %}?category={{ category.id }}"
                 class="text-[#121617] text-sm font-medium leading-normal"
-                href="#"
-                >Formal</a
               >
-              <a
-                class="text-[#121617] text-sm font-medium leading-normal"
-                href="#"
-                >Casual</a
-              >
-              <a
-                class="text-[#121617] text-sm font-medium leading-normal"
-                href="#"
-                >Running</a
-              >
+                {{ category.name }}
+              </a>
+              {% endfor %}
             </div>
             <div class="flex gap-2">
-              <button
-                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f1f3f4] text-[#121617] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
-              >
-                <div
-                  class="text-[#121617]"
-                  data-icon="MagnifyingGlass"
-                  data-size="20px"
-                  data-weight="regular"
-                >
-                  <svg
-                    fill="currentColor"
-                    height="20px"
-                    viewBox="0 0 256 256"
-                    width="20px"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
-                    ></path>
-                  </svg>
-                </div>
-              </button>
+              
               <button
                 class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f1f3f4] text-[#121617] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
               >
@@ -151,11 +125,34 @@
           class="flex items-center justify-center min-h-screen px-4 pt-24 pb-10"
         >
           <div class="w-full max-w-md bg-white shadow-md rounded-xl p-6">
-            <h1 class="text-2xl font-bold text-center mb-6">Change Email</h1>
 
+            {% if messages %}
+               <div id="message-box" class="max-w-md mx-auto mt-4">
+                {% for message in messages %}      
+                  {% if message.tags == 'error' %}
+                  <div class="mb-3 px-4 py-3 rounded-md text-sm bg-red-100 text-red-700 border border-red-300">
+                  {{ message }}
+                  </div>
+                  {% elif message.tags == 'warning' %}
+                  <div class="mb-3 px-4 py-3 rounded-md text-sm bg-yellow-100 text-yellow-800 border border-yellow-300">
+                  {{ message }}
+                  </div>
+                  {% elif message.tags == 'success' %}
+                  <div class="mb-3 px-4 py-3 rounded-md text-sm bg-green-100 text-green-700 border border-green-300">
+                  {{ message }}
+                  </div>
+                  {% else %}
+                 <div class="mb-3 px-4 py-3 rounded-md text-sm bg-gray-100 text-gray-700 border border-gray-300">
+                 {{ message }}
+                 </div>      
+                 {% endif %}
+                {% endfor %}
+               </div>
+              {% endif %}
+
+            <h1 class="text-2xl font-bold text-center mb-6">Change Email</h1>
             <form method="POST">
               {% csrf_token %}
-
               <div class="mb-4">
                 <label class="block text-sm font-medium mb-1">
                   New Email Address
@@ -290,5 +287,13 @@
         </footer>
       </div>
     </div>
+    <script>
+      setTimeout(function () {
+        const messageBox = document.getElementById("message-box");
+        if (messageBox) {
+          messageBox.style.display = "none";
+        }
+      }, 5000); // 5000ms = 5 seconds
+    </script> 
   </body>
 </html>

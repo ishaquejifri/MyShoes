@@ -4,10 +4,11 @@ from django.contrib import messages
 from .decorators import admin_required
 from accounts.models import CustomUser
 from django.core.paginator import Paginator
-from django.db.models import Q
+from django.db.models import Q,Count
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
+from .decorators import admin_required
 
 User = get_user_model()
 
@@ -45,7 +46,7 @@ def admin_logout(request):
     request.session.flush()
     return redirect('admin_login')
 
-# @admin_required
+@admin_required
 @never_cache
 @login_required
 @staff_member_required(login_url='admin_login')
@@ -54,12 +55,13 @@ def admin_dashboard(request):
     return render(request, "dashboard.html")
 
 @never_cache
+@admin_required
 @login_required(login_url='admin_login')
 def user_list(request):
 
     search_query = request.GET.get('search','')
 
-    users = User.objects.filter(is_superuser=False).order_by('-date_joined')
+    users = User.objects.filter(is_superuser=False).annotate(total_orders=Count('orders')).order_by('-date_joined')
     
     if search_query:
         users = users.filter(
@@ -74,9 +76,7 @@ def user_list(request):
     context = {
         'page_obj': page_obj,
         'search_query': search_query
-    }
-
-    
+    }    
 
     return render(request, "user_list.html", context)
 

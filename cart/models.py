@@ -25,7 +25,9 @@ class CartItem(models.Model):
     updated_at = models.DateField(auto_now=True)
 
     def subtotal(self):
-        return self.product.base_price * self.quantity
+        if self.product.offer_price:
+            return self.quantity * self.product.offer_price
+        return self.quantity * self.product.base_price
     
     def __str__(self):
         return f"{self.product.product_name} - {self.quantity}"

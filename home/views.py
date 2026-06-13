@@ -3,6 +3,9 @@ from django.contrib import messages
 from products.models import Product
 from category.models import Category
 from django.core.paginator import Paginator
+from wishlist.models import Wishlist
+from django.views.decorators.cache import never_cache
+from django.contrib.auth.decorators import login_required
 
 
 
@@ -10,7 +13,12 @@ from django.core.paginator import Paginator
 def home_page(request):
 
     categories = Category.objects.filter(is_active=True)   
-    products = Product.objects.select_related('category').all().order_by('-id')[:8]
+    products = Product.objects.select_related('category').filter(
+        is_deleted=False,
+        is_available=True,
+        is_blocked=False,
+        is_listed=True
+    ).order_by('-id')[:8]
 
     return render(request,'home.html', {
         'categories' : categories,
@@ -18,18 +26,35 @@ def home_page(request):
     })
 
 
+@never_cache
+@login_required
 def user_product_list(request, category_id=None):
-    products = Product.objects.all()
+    products = Product.objects.filter(
+        is_deleted=False,
+        is_available=True,
+        is_blocked=False,
+        is_listed=True
+    )
     categories = Category.objects.filter(is_active=True)
     
     category = None
     category_id = request.GET.get('category')
 
     if category_id:
-        category = get_object_or_404(Category,id=category_id)
-        products = products.filter(category=category)
+        category = Category.objects.filter(id=category_id, is_active=True).first()
 
-    
+        if category:
+            products = products.filter(category=category)
+        else:
+            messages.warning(request, 'No More.')    
+
+    wishlist_product_ids = []
+
+    if request.user.is_authenticated:
+        wishlist_product_ids = Wishlist.objects.filter(
+            user = request.user,
+        ).values_list('product_id',flat=True)
+
     search_query = request.GET.get('search','')
     sort_option = request.GET.get('sort','')
     min_price = request.GET.get('min_price','')
@@ -67,22 +92,45 @@ def user_product_list(request, category_id=None):
         'min_price': min_price,
         'max_price': max_price,
         'categories': categories,
+        'wishlist_product_ids': wishlist_product_ids,
 
     })
 
 
+@never_cache
+@login_required
 def user_product_details(request,pk):
     categories = Category.objects.filter(is_active=True)
-    product = Product.objects.get(pk=pk)
 
-    print(product.product_name, product.is_available, product.is_blocked, product.stock)
+    product = get_object_or_404(Product,
+                                 pk=pk,
+                                 is_deleted=False
+                                 )
+    
+    if ( not product.is_listed  or not product.is_available or product.is_blocked ):
+        return render(
+        request,
+        'product_unavailable.html',
+        {'product': product},
+        status=404
+    )
 
+    variants = product.variants.all()
+
+    sizes = variants.values_list('size', flat=True).distinct()
+    colors = variants.values_list('color', flat=True).distinct()
+
+    total_stock = sum(variant.stock for variant in variants)
+        
     related_products = Product.objects.filter(
         category = product.category,
-        is_listed=True
+        is_listed=True,
+        is_deleted=False,
+        is_available=True,
+        is_blocked=False
     ).exclude(id=product.id)[:4]
 
-    if not product.is_available or product.is_blocked or product.stock <= 0:
+    if not product.is_available or product.is_blocked:
         messages.error(request,'Product Unavailable')
         return redirect('product_unavailable')
 
@@ -90,8 +138,33 @@ def user_product_details(request,pk):
         'product': product,
         'related_products': related_products,
         'categories': categories,
+        'variants': variants,
+        'total_stock': total_stock,
+        'sizes': sizes,
+        'colors': colors,
     })
 
+
+@never_cache
+@login_required
+def add_to_wishlist(request,product_id):
+    product = get_object_or_404(Product, id = product_id)
+
+    wishlist_item = Wishlist.objects.filter(
+        user = request.user,
+        product = product
+    ).first()
+
+    if wishlist_item:
+        wishlist_item.delete()
+        messages.warning(request, f'{product.product_name} removed from wishlist 💔')
+    else:
+        Wishlist.objects.create(user=request.user,product=product)
+        messages.success(request, f'{product.product_name} added to wishlist ❤️') 
+
+    return redirect(request.META.get('HTTP_REFERER'))       
+
+    
 
 def product_unavailable(request):
 

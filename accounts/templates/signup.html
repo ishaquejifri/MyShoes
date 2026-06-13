@@ -15,13 +15,15 @@
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   </head>
-  <body>
+  <body>  
     <div
       class="relative flex h-auto min-h-screen w-full flex-col bg-white group/design-root overflow-x-hidden"
       style="--checkbox-tick-svg: url('data:image/svg+xml,%3csvg viewBox=%270 0 16 16%27 fill=%27rgb(255,255,255)%27 xmlns=%27http://www.w3.org/2000/svg%27%3e%3cpath d=%27M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z%27/%3e%3c/svg%3e'); font-family: Manrope, &quot;Noto Sans&quot;, sans-serif;"
     >
       <div class="layout-container flex h-full grow flex-col">
-        <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f2f3f3] px-10 py-3">
+        <header
+          class="fixed top-0 left-0 w-full z-50 bg-white shadow-md flex items-center justify-between whitespace-nowrap border-b border-solid border-b-[#f2f3f3] px-10 py-3 bg-white"
+        >
           <div class="flex items-center gap-4 text-[#141515]">
             <div class="size-4">
               <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -39,27 +41,24 @@
                 ></path>
               </svg>
             </div>
+            <a href="{% url 'home' %}">
             <h2 class="text-[#141515] text-lg font-bold leading-tight tracking-[-0.015em]">Lotto Shoes</h2>
+            </a>
           </div>
           <div class="flex flex-1 justify-end gap-8">
             <div class="flex items-center gap-9">
-              <a class="text-[#141515] text-sm font-medium leading-normal" href="#">Formal</a>
-              <a class="text-[#141515] text-sm font-medium leading-normal" href="#">Casual</a>
-              <a class="text-[#141515] text-sm font-medium leading-normal" href="#">Running</a>
+              {% for category in categories %}
+              <a
+                href="{% url 'user_product_list' %}?category={{ category.id }}"
+                class="text-[#121617] text-sm font-medium leading-normal"
+              >
+                {{ category.name }}
+              </a>
+              {% endfor %}
               
             </div>
             <div class="flex gap-2">
-              <button
-                class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f2f3f3] text-[#141515] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
-              >
-                <div class="text-[#141515]" data-icon="MagnifyingGlass" data-size="20px" data-weight="regular">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
-                    <path
-                      d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"
-                    ></path>
-                  </svg>
-                </div>
-              </button>
+              
               <button
                 class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 bg-[#f2f3f3] text-[#141515] gap-2 text-sm font-bold leading-normal tracking-[0.015em] min-w-0 px-2.5"
               >
@@ -85,7 +84,7 @@
             </div>
           </div>
         </header>
-        <div class="flex flex-1 justify-center items-center px-6 py-8">
+        <div class="flex flex-1 justify-center items-center px-6 py-8 pt-24">
   <div class="w-full max-w-md bg-white shadow-md rounded-lg p-6">
 
     <h1 class="text-xl font-bold text-center mb-5">Create Account</h1>
@@ -109,110 +108,240 @@
   </div>
 {% endif %}
 
-    <form method="POST" action="{% url 'signup'%}">
+    <form method="POST" action="{% url 'signup'%}" id="signup-form" novalidate>
       {% csrf_token %}
 
       <div class="mb-3">
         <label class="block text-sm font-medium mb-1">First Name</label>
         <input
           type="text"
-          name="first_name" 
+          id="first_name"
+          name="first_name"
+          value="{{ request.POST.first_name|default:'' }}"
           placeholder="Enter your first name"
           class="w-full border border-gray-300 rounded-md h-10 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
         required>
+        <p id="error-first_name" class="text-red-500 text-xs mt-1 hidden"></p>
       </div>
 
       <div class="mb-3">
         <label class="block text-sm font-medium mb-1">Last Name</label>
         <input
           type="text"
+          id="last_name"
           name="last_name"
+          value="{{ request.POST.last_name|default:'' }}"
           placeholder="Enter your last name"
           class="w-full border border-gray-300 rounded-md h-10 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
         required>
+        <p id="error-last_name" class="text-red-500 text-xs mt-1 hidden"></p>
       </div>
 
       <div class="mb-3">
         <label class="block text-sm font-medium mb-1">Email</label>
         <input
           type="email"
+          id="email"
           name="email"
+          value="{{ request.POST.email|default:'' }}"
           placeholder="Enter your email"
           class="w-full border border-gray-300 rounded-md h-10 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
         required>
+        <p id="error-email" class="text-red-500 text-xs mt-1 hidden"></p>
       </div>
 
       <div class="mb-3">
         <label class="block text-sm font-medium mb-1">Phone Number</label>
         <input
           type="text"
+          id="phone"
           name="phone"
+          value="{{ request.POST.phone|default:'' }}"
           placeholder="Enter your phone number"
           class="w-full border border-gray-300 rounded-md h-10 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400"
         required>
+        <p id="error-phone" class="text-red-500 text-xs mt-1 hidden"></p>
       </div>
-<div class="mb-3">
-  <label class="block text-sm font-medium mb-1">Password</label>
 
-  <div class="relative">
-    <input
-      type="password"
-      id="password"
-      name="password"
-      placeholder="Enter your password"
-      class="w-full border border-gray-300 rounded-md h-10 px-3 pr-10 focus:outline-none focus:ring-1 focus:ring-gray-400"
-    required>
+      <div class="mb-3">
+        <label class="block text-sm font-medium mb-1">Password</label>
+        <div class="relative">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Enter your password"
+            class="w-full border border-gray-300 rounded-md h-10 px-3 pr-10 focus:outline-none focus:ring-1 focus:ring-gray-400"
+          required>
+          <button
+            type="button"
+            onclick="togglePassword('password')"
+            class="absolute right-2 top-2 text-gray-500"
+          >
+            👁
+          </button>
+        </div>
+        <p id="error-password" class="text-red-500 text-xs mt-1 hidden"></p>
+      </div>
 
-    <button
-      type="button"
-      onclick="togglePassword('password')"
-      class="absolute right-2 top-2 text-gray-500"
-    >
-      👁
-    </button>
-  </div>
-</div>
+      <div class="mb-3">
+        <label class="block text-sm font-medium mb-1">Confirm Password</label>
+        <div class="relative">
+          <input
+            type="password"
+            id="confirm_password"
+            name="confirm_password"
+            placeholder="Confirm your password"
+            class="w-full border border-gray-300 rounded-md h-10 px-3 pr-10 focus:outline-none focus:ring-1 focus:ring-gray-400"
+          required>
+          <button
+            type="button"
+            onclick="togglePassword('confirm_password')"
+            class="absolute right-2 top-2 text-gray-500"
+          >
+            👁
+          </button>
+        </div>
+        <p id="error-confirm_password" class="text-red-500 text-xs mt-1 hidden"></p>
+      </div>
 
+      <script>
+      function togglePassword(fieldId) {
+        const passwordField = document.getElementById(fieldId);
+        if (passwordField.type === "password") {
+          passwordField.type = "text";
+        } else {
+          passwordField.type = "password";
+        }
+      }
 
-<div class="mb-3">
-  <label class="block text-sm font-medium mb-1">Confirm Password</label>
+      document.addEventListener("DOMContentLoaded", function() {
+        const form = document.getElementById("signup-form");
+        const fields = {
+          first_name: {
+            el: document.getElementById("first_name"),
+            err: document.getElementById("error-first_name"),
+            validate: (val) => {
+              const trimmed = val.trim();
+              if (!trimmed) return "First name is required.";
+              if (trimmed.length < 3 || trimmed.length > 15) return "First name must be between 3 and 15 characters.";
+              if (!/^[A-Za-z ]+$/.test(trimmed)) return "First name should contain only letters and spaces.";
+              return "";
+            }
+          },
+          last_name: {
+            el: document.getElementById("last_name"),
+            err: document.getElementById("error-last_name"),
+            validate: (val) => {
+              const trimmed = val.trim();
+              if (!trimmed) return "Last name is required.";
+              if (trimmed.length < 3 || trimmed.length > 15) return "Last name must be between 3 and 15 characters.";
+              if (!/^[A-Za-z ]+$/.test(trimmed)) return "Last name should contain only letters and spaces.";
+              return "";
+            }
+          },
+          email: {
+            el: document.getElementById("email"),
+            err: document.getElementById("error-email"),
+            validate: (val) => {
+              const trimmed = val.trim();
+              if (!trimmed) return "Email is required.";
+              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              if (!emailRegex.test(trimmed)) return "Please enter a valid email address.";
+              return "";
+            }
+          },
+          phone: {
+            el: document.getElementById("phone"),
+            err: document.getElementById("error-phone"),
+            validate: (val) => {
+              const trimmed = val.trim();
+              if (!trimmed) return "Phone number is required.";
+              const digits = trimmed.replace(/\D/g, '');
+              if (digits.length !== 10) return "Phone number must contain exactly 10 digits.";
+              if (/^(\d)\1{9}$/.test(digits)) return "Invalid phone number (cannot be all same digits).";
+              const sequentialPatterns = ['1234567890', '0123456789', '9876543210', '0987654321'];
+              if (sequentialPatterns.includes(digits)) return "Enter a valid phone number.";
+              return "";
+            }
+          },
+          password: {
+            el: document.getElementById("password"),
+            err: document.getElementById("error-password"),
+            validate: (val) => {
+              if (!val) return "Password is required.";
+              if (val.length < 8) return "Password must be at least 8 characters long.";
+              if (!/[a-z]/.test(val)) return "Password must contain at least one lowercase letter.";
+              if (!/[A-Z]/.test(val)) return "Password must contain at least one uppercase letter.";
+              if (!/[0-9]/.test(val)) return "Password must contain at least one number.";
+              if (!/[@$%&*!?]/.test(val)) return "Password must contain at least one special character.";
+              return "";
+            }
+          },
+          confirm_password: {
+            el: document.getElementById("confirm_password"),
+            err: document.getElementById("error-confirm_password"),
+            validate: (val) => {
+              if (!val) return "Confirm password is required.";
+              const passwordVal = document.getElementById("password").value;
+              if (val !== passwordVal) return "Passwords do not match.";
+              return "";
+            }
+          }
+        };
 
-  <div class="relative">
-    <input
-      type="password"
-      id="confirm_password"
-      name="confirm_password"
-      placeholder="Confirm your password"
-      class="w-full border border-gray-300 rounded-md h-10 px-3 pr-10 focus:outline-none focus:ring-1 focus:ring-gray-400"
-    required>
+        function validateField(name) {
+          const field = fields[name];
+          if (!field) return true;
+          const errorMsg = field.validate(field.el.value);
+          if (errorMsg) {
+            field.err.textContent = errorMsg;
+            field.err.classList.remove("hidden");
+            field.el.classList.add("border-red-500", "focus:ring-red-400");
+            field.el.classList.remove("border-gray-300", "focus:ring-gray-400");
+            return false;
+          } else {
+            field.err.textContent = "";
+            field.err.classList.add("hidden");
+            field.el.classList.remove("border-red-500", "focus:ring-red-400");
+            field.el.classList.add("border-gray-300", "focus:ring-gray-400");
+            return true;
+          }
+        }
 
-    <button
-      type="button"
-      onclick="togglePassword('confirm_password')"
-      class="absolute right-2 top-2 text-gray-500"
-    >
-      👁
-    </button>
-  </div>
-</div>
+        Object.keys(fields).forEach(name => {
+          const field = fields[name];
+          field.el.addEventListener("blur", () => validateField(name));
+          field.el.addEventListener("input", () => {
+            if (!field.err.classList.contains("hidden")) {
+              validateField(name);
+            }
+          });
+        });
 
+        form.addEventListener("submit", function(e) {
+          let isValid = true;
+          let firstInvalidField = null;
 
-<script>
-function togglePassword(fieldId) {
-  const passwordField = document.getElementById(fieldId);
-
-  if (passwordField.type === "password") {
-    passwordField.type = "text";
-  } else {
-    passwordField.type = "password";
-  }
-}
-</script>
-   
-
-     
-
-      <button
+          Object.keys(fields).forEach(name => {
+            const fieldValid = validateField(name);
+            if (!fieldValid) {
+              isValid = false;
+              if (!firstInvalidField) {
+                firstInvalidField = fields[name].el;
+              }
+            }
+          });
+          if (!isValid) {
+            e.preventDefault();
+            if (firstInvalidField) {
+              firstInvalidField.focus();
+            }
+          }
+        });
+      });
+      </script>
+         <button
         type="submit"
         class="w-full bg-[#222f2e] text-white h-10 rounded-md font-semibold"
       >
@@ -239,11 +368,11 @@ function togglePassword(fieldId) {
           <div class="flex max-w-[960px] flex-1 flex-col">
             <footer class="flex flex-col gap-6 px-5 py-10 text-center @container">
               <div class="flex flex-wrap items-center justify-center gap-6 @[480px]:flex-row @[480px]:justify-around">
-                <a class="text-[#727978] text-base font-normal leading-normal min-w-40" href="#">About Us</a>
-                <a class="text-[#727978] text-base font-normal leading-normal min-w-40" href="#">Contact</a>
-                <a class="text-[#727978] text-base font-normal leading-normal min-w-40" href="#">FAQ</a>
-                <a class="text-[#727978] text-base font-normal leading-normal min-w-40" href="#">Returns &amp; Exchanges</a>
-                <a class="text-[#727978] text-base font-normal leading-normal min-w-40" href="#">Privacy Policy</a>
+                <a class="text-[#727978] text-sm font-normal leading-normal min-w-40" href="#">About Us</a>
+                <a class="text-[#727978] text-sm font-normal leading-normal min-w-40" href="#">Contact</a>
+                <a class="text-[#727978] text-sm font-normal leading-normal min-w-40" href="#">FAQ</a>
+                <a class="text-[#727978] text-sm font-normal leading-normal min-w-40" href="#">Returns &amp; Exchanges</a>
+                <a class="text-[#727978] text-sm font-normal leading-normal min-w-40" href="#">Privacy Policy</a>
               </div>
               <div class="flex flex-wrap justify-center gap-4">
                 <a href="#">
@@ -274,7 +403,7 @@ function togglePassword(fieldId) {
                   </div>
                 </a>
               </div>
-              <p class="text-[#727978] text-base font-normal leading-normal">@2026 Lotto Shoes. All rights reserved.</p>
+              <p class="text-[#727978] text-sm font-normal leading-normal">@2026 Lotto Shoes All rights reserved.</p>
             </footer>
           </div>
         </footer>
@@ -287,7 +416,7 @@ setTimeout(function() {
   if (messageBox) {
     messageBox.style.display = "none";
   }
-}, 10000); // 10000ms = 10 seconds
+}, 5000); // 5000ms = 5 seconds
 </script>  
 
   </body>

@@ -75,7 +75,7 @@
                       Products
                     </p>
                   </a>
-                  <a href="#" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
+                  <a href="{% url 'admin_order_list' %}" class="flex items-center gap-3 px-3 py-2 hover:bg-[#224939] rounded-lg transition">
                     <div
                       class="text-white"
                       data-icon="Receipt"
@@ -275,6 +275,17 @@
             class="layout-content-container flex flex-col max-w-[960px] flex-1"
           >
             <div class="flex flex-wrap justify-between gap-3 p-4">
+              {% if messages %}
+              <div id="message-container" class="px-4 pt-4">
+                {% for message in messages %}
+                <div
+                  class="mb-3 p-3 rounded-lg text-white {% if message.tags == 'success' %} bg-green-600 {% elif message.tags == 'error' %} bg-red-600 {% else %} bg-gray-600 {% endif %}"
+                >
+                  {{ message }}
+                </div>
+                {% endfor %}
+              </div>
+              {% endif %}
               <p
                 class="text-white tracking-light text-[32px] font-bold leading-tight min-w-72"
               >
@@ -345,11 +356,7 @@
                     Category: {{ product.category.name }}
                   </p>
 
-                  <p class="text-[#94c7b6] text-sm">
-                    Stock: {{ product.stock }}
-                  </p>
-
-                  <div class="border-t border-[#356454] pt-4">
+                   <div class="border-t border-[#356454] pt-4">
                     <p class="text-white text-sm leading-relaxed">
                       {{ product.description }}
                     </p>
@@ -454,6 +461,18 @@
         </div>
       </div>
     </div>
+     <script>
+  setTimeout(() => {
+    const messageBox = document.getElementById("message-container");
+    if (messageBox) {
+      messageBox.style.transition = "opacity 0.5s ease";
+      messageBox.style.opacity = "0";
+      setTimeout(() => {
+        messageBox.remove();
+      }, 500);
+    }
+  }, 5000);
+  </script>
 
     <script>
   function changeMainImage(imageUrl) {

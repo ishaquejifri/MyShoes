@@ -5,46 +5,82 @@ from .models import Cart,CartItem
 from django.http import JsonResponse
 from django.contrib import messages
 from category.models import Category
+from products.models import ProductVariant
+from wishlist.models import Wishlist
+from django.views.decorators.cache import never_cache
 
 
 # Create your views here.
-
-
+@never_cache
+@login_required(login_url='login')
 def add_to_cart(request,product_id):
     if not request.user.is_authenticated:
         messages.warning(request,"⚠️ Please Login to purchase the Product")
-        return redirect(f'/user/login/?next=/cart/add/{id}/')
+        return redirect(f'/user/login/?next=/cart/add/{product_id}/')
 
     product = get_object_or_404(Product,id=product_id)
 
+    variant_id = request.POST.get('variant_id')
     
-    if product.stock <= 0 or not product.is_available or product.is_blocked:
+    if not variant_id:
+        messages.error(request,'Please select size and color.')
+        return redirect(request.META.get('HTTP_REFERER', 'wishlist'))
+
+    variant = get_object_or_404(ProductVariant, id=variant_id, product=product)
+
+    # Product availability check
+    if not product.is_available or product.is_blocked:
         messages.error(request, "This product is unavailable.")
         return redirect('user_product_list')
+    
+    # Variant stock check
+    if variant.stock <= 0:
+        messages.error(request,'Selected variant is out of stock.')
+        return redirect('wishlist')
 
     cart, created = Cart.objects.get_or_create(user=request.user)
 
     cart_item, item_created = CartItem.objects.get_or_create(
         cart=cart,
         product=product,
+        variant=variant,
         defaults={
             'quantity': 1,
-            'price': product.base_price
+            'price': product.offer_price or product.base_price
                   })
 
-    
+    #already exists in cart
     if not item_created:
+        
+        #max quantity check
+        if cart_item.quantity >= CartItem.MAX_QUANTITY_PER_PRODUCT:
+            messages.error(request,'Maximum quantity reached.')
+            return redirect('cart:view_cart')
+        
+        #variant stock limit check
+        if cart_item.quantity >= variant.stock:
+            messages.error(request,'No More stock available.')
+            return redirect('cart:view_cart')
         cart_item.quantity += 1
         cart_item.save()
-        messages.success(request, "Quantity increased in cart.")
+
+        messages.success(request,'Quantity increased in cart')
     else:
-        messages.error(request, "No more stock available.")
+        messages.success(request,'Product added to the cart') 
 
-    return redirect('cart:view_cart') 
+    #remove from wishlist
+    if request.POST.get('from_wishlist') == 'true':
+        Wishlist.objects.filter(
+        user=request.user,
+        product=product
+    ).delete()
+    return redirect('cart:view_cart')       
 
-@login_required
+
+@never_cache
+@login_required(login_url='login')
 def view_cart(request):
-    categories = Category.objects.filter(is_active=True)
+    categories = Category.objects.filter(is_active=True)  
     cart, created = Cart.objects.get_or_create(user = request.user)
     cart_items = cart.items.all()
 
@@ -58,7 +94,8 @@ def view_cart(request):
         'categories': categories,
     })  
 
-@login_required
+@never_cache
+@login_required(login_url='login')
 def update_cart(request,item_id, action):
     cart_item = get_object_or_404(CartItem,id=item_id,cart__user=request.user)
 
@@ -75,7 +112,7 @@ def update_cart(request,item_id, action):
     cart_item.save()
     return redirect('cart:view_cart')  
 
-@login_required
+@login_required(login_url='login')
 def ajax_update_cart(request):
     if request.method == "POST":
         item_id = request.POST.get('item_id')
@@ -84,7 +121,7 @@ def ajax_update_cart(request):
         cart_item = get_object_or_404(CartItem,id=item_id,cart__user=request.user)
 
         if action == 'increase':
-            if cart_item.quantity < cart_item.product.stock:
+            if cart_item.quantity < cart_item.variant.stock:
                 cart_item.quantity += 1
         elif action == 'decrease':
             if cart_item.quantity > 1:
@@ -101,8 +138,8 @@ def ajax_update_cart(request):
             'cart_count': cart_item.cart.items.count()
         })                
 
-
-@login_required
+@never_cache
+@login_required(login_url='login')
 def remove_from_cart(request,item_id):
     cart_item = get_object_or_404(CartItem, id=item_id, cart__user=request.user)
     cart_item.delete()
