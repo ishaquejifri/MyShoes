@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.db.models import Q
 from django.views.decorators.cache import never_cache
 from adminpanel.decorators import admin_required
+from django.db import transaction
 
 
 @never_cache
@@ -88,39 +89,76 @@ def admin_update_order_status(request, order_id):
             'out_for_delivery',
             'delivered',
             'cancelled',
+            'return_requested',
             'returned',
+            'return_rejected',
         ]
  
         if new_status in valid_status and order.status.lower() != new_status.lower():
-            # If changing to returned or cancelled, restore stock for items not already cancelled or returned
-            if new_status.lower() in ['cancelled', 'returned']:
-                for item in order.items.all():
-                    if item.item_status.lower() not in ['cancelled', 'returned']:
-                        variant = item.variant
-                        variant.stock += item.quantity
-                        variant.save()
-                        item.item_status = new_status.lower()
-                        item.save()
+            with transaction.atomic():
+                # If changing to returned or cancelled, restore stock for items not already cancelled or returned
+                if new_status.lower() in ['cancelled', 'returned']:
+                    for item in order.items.all():
+                        if item.item_status.lower() not in ['cancelled', 'returned']:
+                            variant = item.variant
+                            variant.stock += item.quantity
+                            variant.save()
+                            item.item_status = new_status.lower()
+                            item.save()
 
-            order.status = new_status.lower()
-            order.save()
+                order.status = new_status.lower()
+                order.save()
 
-            order.items.exclude(
-                item_status__in=['cancelled', 'returned', 'Cancelled', 'Returned']
-            ).update(
-                item_status=new_status.lower()
-            )
+                order.items.exclude(
+                    item_status__in=['cancelled', 'returned', 'Cancelled', 'Returned']
+                ).update(
+                    item_status=new_status.lower()
+                )
 
-            OrderStatusHistory.objects.create(
-                order = order,
-                status = new_status
-            )
+                OrderStatusHistory.objects.create(
+                    order = order,
+                    status = new_status
+                )
+
+                # Refund logic
+                from accounts.models import Wallet, WalletTransaction
+                wallet, _ = Wallet.objects.get_or_create(user=order.user)
+
+                if new_status.lower() == 'cancelled':
+                    # Only paid methods online and wallet get direct refund for cancellations
+                    if order.payment_method in ['online', 'wallet']:
+                        already_refunded = WalletTransaction.objects.filter(
+                            wallet=wallet, order=order, transaction_type='refund', description__icontains="cancelled"
+                        ).exists()
+                        if not already_refunded:
+                            wallet.deposit(
+                                amount=order.total_amount,
+                                description=f"Refund for cancelled Order #{order.order_id}",
+                                transaction_type='refund',
+                                order=order
+                            )
+                            messages.success(request, f"Refund of ₹{order.total_amount} credited to customer's wallet.")
+
+                elif new_status.lower() == 'returned':
+                    # All returns get wallet refunds upon admin confirmation
+                    already_refunded = WalletTransaction.objects.filter(
+                        wallet=wallet, order=order, transaction_type='refund', description__icontains="returned"
+                    ).exists()
+                    if not already_refunded:
+                        wallet.deposit(
+                            amount=order.total_amount,
+                            description=f"Refund for returned Order #{order.order_id}",
+                            transaction_type='refund',
+                            order=order
+                        )
+                        messages.success(request, f"Refund of ₹{order.total_amount} credited to customer's wallet.")
 
             messages.success(request,'Order status updated successfully')
         else:
             messages.error(request, f'Invalid or unchanged status:{new_status}')    
 
     return redirect('admin_order_details', order_id=order.order_id)
+
 
 @never_cache
 @admin_required

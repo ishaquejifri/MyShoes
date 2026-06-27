@@ -13,4 +13,6 @@ urlpatterns = [
     # User coupon views
     path('available/',views.user_available_coupons,name='user_available_coupons'),
     path('my-usage/',views.user_coupon_usage_history,name='user_coupon_usage_history'),
+    path('apply/',views.apply_coupon,name='apply_coupon'),
+    path('remove/',views.remove_coupon,name='remove_coupon'),
 ]

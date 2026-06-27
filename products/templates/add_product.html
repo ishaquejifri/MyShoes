@@ -655,9 +655,10 @@
           const canvas = cropper.getCroppedCanvas({
             width: 500,
             height: 500,
+            fillColor: '#ffffff'
           });
 
-          const croppedImage = canvas.toDataURL("image/jpeg");
+          const croppedImage = canvas.toDataURL("image/png");
 
           document.getElementById("croppedImageInput").value = croppedImage;
 
@@ -714,7 +715,7 @@
                   height: 500,
                 });
 
-                const croppedData = canvas.toDataURL("image/jpeg");
+                const croppedData = canvas.toDataURL("image/png");
 
                 const input = document.createElement("input");
                 input.type = "hidden";

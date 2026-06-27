@@ -4,10 +4,11 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth import authenticate,get_user_model,login,logout
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
-from .models import CustomUser,Address
+from .models import CustomUser,Address,Wallet,WalletTransaction
 from .forms import SignupForm, LoginForm,AddressForm
 from django.contrib import messages
 from django.utils import timezone
+from decimal import Decimal, InvalidOperation
 from datetime import timedelta
 from django.conf import settings
 from products.models import Category
@@ -21,6 +22,7 @@ from django.core.exceptions import ValidationError
 User = get_user_model()
 
 def signup(request):
+    referral_code = request.GET.get('ref','')
 
     if request.method == "POST":
 
@@ -30,6 +32,7 @@ def signup(request):
         phone = request.POST.get('phone')
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password') 
+        referral_code = request.POST.get('referral_code', '').strip().upper()
 
         # Empty field validation
         if not all([first_name,last_name,email,phone,password,confirm_password]):
@@ -115,12 +118,16 @@ def signup(request):
 
         otp = generate_otp()
 
+        if not referral_code:
+            referral_code = request.session.get('referral_code', '')
+
         request.session['signup_data'] = {
             'first_name': first_name,
             'last_name': last_name,
             'email': email,
             'phone': digits_only,
             'password': password,
+            'referral_code': referral_code,
             'otp': otp,
             'otp_created_at': timezone.now().isoformat(),
         }
@@ -162,7 +169,11 @@ def signup(request):
     
         return redirect('verify_otp')
     
-    return render(request,'signup.html')
+    ref = request.GET.get('ref', '').strip()
+    if ref:
+        request.session['referral_code'] = ref
+        
+    return render(request,'signup.html',{'referral_code': referral_code,})
 
 def signup_error(request, message):
     messages.error(request, message)
@@ -194,7 +205,13 @@ def verify_otp(request):
                     messages.error(request, 'OTP has expired')
                     return redirect('signup')
 
-            if entered_otp == signup_data['otp']:
+                referred_by_user = None
+                ref_code = signup_data.get('referral_code')
+                if ref_code:
+                    try:
+                        referred_by_user = User.objects.get(referral_code=ref_code)
+                    except User.DoesNotExist:
+                        pass
 
                 user = User.objects.create_user(
                     username=signup_data['email'],
@@ -202,13 +219,30 @@ def verify_otp(request):
                     first_name=signup_data['first_name'],
                     last_name=signup_data['last_name'],
                     password=signup_data['password'],
-                    phone=signup_data['phone']
+                    phone=signup_data['phone'],
+                    referred_by=referred_by_user
                 )
+
+                # Payout referral bonuses
+                if referred_by_user:
+                    referrer_wallet, _ = Wallet.objects.get_or_create(user=referred_by_user)
+                    referrer_wallet.deposit(
+                        amount=Decimal('100.00'),
+                        description=f"Referral reward for inviting {user.email}",
+                        transaction_type='referral_reward'
+                    )
+                    referee_wallet, _ = Wallet.objects.get_or_create(user=user)
+                    referee_wallet.deposit(
+                        amount=Decimal('50.00'),
+                        description=f"Sign up bonus using referral from {referred_by_user.email}",
+                        transaction_type='referral_reward'
+                    )
 
                 request.session.pop('signup_data', None)
                 request.session.pop('otp', None)
                 request.session.pop('signup_email', None)
                 request.session.pop('otp_purpose', None)
+                request.session.pop('referral_code', None)
 
                 messages.success(request, 'Account created successfully')
                 return redirect('login')
@@ -807,3 +841,30 @@ def delete_address(request, id):
         return redirect('checkout')
 
     return redirect('my_address')
+
+
+@never_cache
+@login_required(login_url='login')
+def user_wallet(request):
+    categories = Category.objects.filter(is_active=True)
+    wallet, created = Wallet.objects.get_or_create(user=request.user)
+    transactions = wallet.transactions.all().order_by('-timestamp')
+
+    if request.method == 'POST':
+        amount = request.POST.get('amount', '').strip()
+        try:
+            amount = Decimal(amount)
+            if amount <= 0:
+                raise ValueError
+            wallet.deposit(amount, "Funds deposited to wallet", transaction_type='deposit')
+            messages.success(request, f"₹{amount} deposited successfully to your wallet!")
+            return redirect('user_wallet')
+        except (ValueError, InvalidOperation):
+            messages.error(request, "Please enter a valid deposit amount.")
+            return redirect('user_wallet')
+
+    return render(request, 'accounts/wallet.html', {
+        'wallet': wallet,
+        'transactions': transactions,
+        'categories': categories,
+    })

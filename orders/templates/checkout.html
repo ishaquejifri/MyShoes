@@ -274,6 +274,29 @@
                   </div>
                 </label>
               </div>
+
+              <div class="px-4 py-3">
+                <label
+                  class="flex items-center gap-3 bg-white border border-[#cee8e8] rounded-xl p-4 cursor-pointer {% if wallet.balance < total %}opacity-50{% endif %}"
+                >
+                  <input
+                    type="radio"
+                    name="payment_method"
+                    value="wallet"
+                    {% if wallet.balance < total %}disabled{% endif %}
+                  />
+
+                  <div>
+                    <p class="font-bold text-[#0d1c1c]">Wallet Payment</p>
+                    <p class="text-sm text-[#499c9c]">
+                      Pay using your Lotto Wallet balance (Available: ₹{{ wallet.balance }})
+                    </p>
+                    {% if wallet.balance < total %}
+                      <p class="text-xs text-red-500 font-semibold mt-1">Insufficient balance to pay with wallet.</p>
+                    {% endif %}
+                  </div>
+                </label>
+              </div>
             </div>
 
             <!-- RIGHT SIDE -->
@@ -343,39 +366,46 @@
                     {% endif %}                
                   </p>
                 </div>
-              </div>
-                 <!-- Apply coupon -->
-                  <div class="bg-white rounded-lg p-5 mt-6">
-                <h3 class="font-semibold text-lg mb-4">
-                  Apply Coupon
-                </h3>
-                <form method="POST"
-                  action="#">
-                {% csrf_token %}
-                <div class="flex gap-3">
-                <input type="text"
-                   name="coupon_code"
-                   placeholder="Enter Coupon Code"
-                   class="border rounded-lg px-4 py-2 flex-1">
 
-            
-            </div>
-            <br>
-            <button type="submit"
-                    class="bg-green-600 text-white px-5 py-2 rounded-lg">
-                Apply
-              </button>
-            </form>
-          </div>
                 {% if coupon %}
-                <div class="mt-4 text-green-600">
-                Coupon Applied:
-                <strong>{{ coupon.code }}</strong>
-                <br>
-                Discount:
-                ₹{{ discount }}
+                <div
+                  class="col-span-2 grid grid-cols-subgrid border-t border-t-[#cee8e8] py-5"
+                >
+                  <p class="text-green-600 text-sm font-semibold leading-normal">
+                    Coupon ({{ coupon.code }})
+                  </p>
+                  <p class="text-green-600 text-sm font-semibold leading-normal">                   
+                    - ₹ {{ coupon_discount }}
+                  </p>
                 </div>
                 {% endif %}
+              </div>
+                 <!-- Apply coupon -->
+                  <div class="bg-white rounded-lg p-4 border border-[#cee8e8] m-4">
+                    <h3 class="font-semibold text-base mb-2">
+                      Apply Coupon
+                    </h3>
+                    <div class="flex gap-2">
+                      <input type="text"
+                         id="coupon-code-input"
+                         placeholder="Enter Code"
+                         value="{% if coupon %}{{ coupon.code }}{% endif %}"
+                         class="border border-[#cee8e8] rounded-lg px-3 py-1 flex-1 text-sm">
+                      <button type="button"
+                              onclick="submitCoupon()"
+                              class="bg-[#0df2f2] text-[#0d1c1c] px-4 py-1 rounded-lg font-bold text-sm">
+                          Apply
+                      </button>
+                    </div>
+                    {% if coupon %}
+                    <div class="mt-3 p-2 bg-green-50 rounded-lg text-green-700 flex justify-between items-center text-sm border border-green-200">
+                      <div>
+                        <strong>{{ coupon.code }}</strong> applied
+                      </div>
+                      <button type="button" onclick="removeCoupon()" class="text-red-600 hover:text-red-800 font-bold">Remove</button>
+                    </div>
+                    {% endif %}
+                  </div>
               <!-- TOTAL -->
               <div class="p-4">
                 <div class="flex justify-between gap-x-6 py-2">
@@ -510,18 +540,40 @@
         </footer>
       </div>
     </div>
+      <!-- Hidden Coupon Forms -->
+      <form id="apply-coupon-form" method="POST" action="{% url 'apply_coupon' %}" style="display:none;">
+        {% csrf_token %}
+        <input type="hidden" name="coupon_code" id="hidden-coupon-code">
+      </form>
+      <form id="remove-coupon-form" method="POST" action="{% url 'remove_coupon' %}" style="display:none;">
+        {% csrf_token %}
+      </form>
+
       <script>
-  setTimeout(() => {
-    const alerts = document.querySelectorAll('.alert-message');
-    alerts.forEach((alert) => {
-      alert.style.transition = 'opacity 0.5s ease';
-      alert.style.opacity = '0';
+      function submitCoupon() {
+          const code = document.getElementById('coupon-code-input').value.trim();
+          if (code) {
+              document.getElementById('hidden-coupon-code').value = code;
+              document.getElementById('apply-coupon-form').submit();
+          } else {
+              alert('Please enter a coupon code.');
+          }
+      }
+      function removeCoupon() {
+          document.getElementById('remove-coupon-form').submit();
+      }
+
       setTimeout(() => {
-        alert.remove();
-      }, 500);
-    });
-  }, 5000); // 5 seconds
-  </script>
+        const alerts = document.querySelectorAll('.alert-message');
+        alerts.forEach((alert) => {
+          alert.style.transition = 'opacity 0.5s ease';
+          alert.style.opacity = '0';
+          setTimeout(() => {
+            alert.remove();
+          }, 500);
+        });
+      }, 5000); // 5 seconds
+      </script>
 
   </body>
 </html>

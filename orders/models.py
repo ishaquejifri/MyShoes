@@ -24,7 +24,9 @@ class Order(models.Model):
         ("out_for_delivery","Out for Delivery"),
         ("delivered","Delivered"),
         ("cancelled","Cancelled"),
+        ("return_requested","Return Requested"),
         ("returned","Returned"),
+        ("return_rejected","Return Rejected"),
     ]
 
     PAYMENT_METHOD_CHOICES = [

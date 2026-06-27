@@ -20,4 +20,5 @@ urlpatterns = [
     path('add-address/',views.add_address,name='add_address'),
     path('edit-address/<int:id>/',views.edit_address,name='edit_address'),
     path('delete-address/<int:id>/',views.delete_address,name='delete_address'),  
+    path('wallet/', views.user_wallet, name='user_wallet'),
 ]

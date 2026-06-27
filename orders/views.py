@@ -4,15 +4,17 @@ import string,random
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from decimal import Decimal
+from django.db import transaction
 from cart.models import Cart
 from .models import Order,OrderItem
-from accounts.models import Address
+from accounts.models import Address, Wallet, WalletTransaction
 from category.models import Category
 from reportlab.platypus import SimpleDocTemplate,Paragraph,Spacer,Table, TableStyle
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.lib.pagesizes import letter
 from io import BytesIO
+from coupons.models import Coupon
 
 # Create your views here.
 
@@ -39,16 +41,60 @@ def checkout(request):
     else:
         shipping_charge = Decimal('40.00')    
 
-    total = subtotal + shipping_charge
+    # Coupon details calculation
+    coupon_code = request.session.get('coupon_code')
+    coupon_discount = Decimal('0.00')
+    coupon = None
+    if coupon_code:
+        try:
+            from coupons.models import Coupon
+            coupon = Coupon.objects.get(code=coupon_code)
+            is_valid, msg = coupon.is_valid()
+            if is_valid:
+                can_use, msg_use = coupon.can_user_use(request.user)
+                if can_use and subtotal >= coupon.min_purchase_amount:
+                    coupon_discount, _ = coupon.calculate_discount(subtotal)
+                else:
+                    request.session.pop('coupon_code', None)
+                    coupon = None
+            else:
+                request.session.pop('coupon_code', None)
+                coupon = None
+        except Coupon.DoesNotExist:
+            request.session.pop('coupon_code', None)
+
+    # Available coupons for this user
+    from coupons.models import Coupon, CouponUsage
+    from django.db.models import Exists, OuterRef
+    today = __import__('django.utils.timezone', fromlist=['now']).now().date()
+    all_active = Coupon.objects.filter(
+        is_active=True, start_date__lte=today, end_date__gte=today
+    ).annotate(
+        user_has_used=Exists(CouponUsage.objects.filter(coupon=OuterRef('pk'), user=request.user))
+    )
+    available_coupons = []
+    for c in all_active:
+        if c.usage_limit and c.times_used >= c.usage_limit:
+            continue
+        if c.one_time_use and c.user_has_used:
+            continue
+        available_coupons.append(c)
+
+    total = subtotal + shipping_charge - coupon_discount
+
+    wallet, _ = Wallet.objects.get_or_create(user=request.user)
 
     context = {
-        'categories': categories,   
+        'categories': categories,
         'cart_items': cart_items,
         'addresses': addresses,
         'subtotal': subtotal,
         'shipping_charge': shipping_charge,
+        'coupon': coupon,
+        'coupon_discount': coupon_discount,
+        'wallet': wallet,
         'total': total,
-
+        'available_coupons': available_coupons,
     }
 
     return render(request, 'checkout.html', context)
@@ -66,6 +112,7 @@ def place_order(request):
         return redirect('cart:view_cart')
     
     address_id = request.POST.get('address_id')
+    payment_method = request.POST.get('payment_method', 'cod')
 
     if not address_id:
         messages.error(request,'Please select an address')
@@ -74,57 +121,105 @@ def place_order(request):
     address = get_object_or_404(Address,id=address_id, user=request.user)
 
     subtotal = sum(item.subtotal() for item in cart_items)
+    shipping = Decimal('0.00') if subtotal >= 5000 else Decimal('40.00')
+    
+    # Coupon Discount logic
+    coupon_code = request.session.get('coupon_code')
+    coupon_discount = Decimal('0.00')
+    coupon = None
+    if coupon_code:
+        try:
+            from coupons.models import Coupon, CouponUsage
+            coupon = Coupon.objects.get(code=coupon_code)
+            is_valid, msg = coupon.is_valid()
+            if is_valid:
+                can_use, msg_use = coupon.can_user_use(request.user)
+                if can_use and subtotal >= coupon.min_purchase_amount:
+                    coupon_discount, _ = coupon.calculate_discount(subtotal)
+        except Coupon.DoesNotExist:
+            pass
 
-    shipping = 40
-    discount = 0
-    grand_total = subtotal + shipping - discount
+    grand_total = subtotal + shipping - coupon_discount
 
-    order = Order.objects.create(
-        order_id = generate_order_id(),
-        user = request.user,
-        shipping_address = address,
-        full_name = address.full_name,
-        mobile = address.phone,
-        street_address = address.address_line,
-        city = address.city,
-        state = address.state,
-        postal_code = address.postal_code,
-        payment_method = 'cod',
-        sub_total = subtotal,
-        shipping_charge = shipping,
-        discount_amount = discount,
-        total_amount = grand_total,
-    )
-
-    for item in cart_items:
-        variant = item.variant
-        if variant.stock < item.quantity:
-            messages.error(request,f"Only{variant.stock} stock available for {item.product.product_name}")
-            order.delete()
+    if payment_method == 'wallet':
+        wallet, _ = Wallet.objects.get_or_create(user=request.user)
+        if wallet.balance < grand_total:
+            messages.error(request, 'Insufficient wallet balance.')
             return redirect('checkout')
-        
-        OrderItem.objects.create(
-            order = order,
-            product = item.product,
-            variant = variant,
 
-            product_name = item.product.product_name,
-            variant_size = variant.size,
-            variant_color = variant.color,
+    try:
+        with transaction.atomic():
+            order_id = generate_order_id()
+            order = Order.objects.create(
+                order_id = order_id,
+                user = request.user,
+                shipping_address = address,
+                full_name = address.full_name,
+                mobile = address.phone,
+                street_address = address.address_line,
+                city = address.city,
+                state = address.state,
+                postal_code = address.postal_code,
+                payment_method = payment_method,
+                status = 'confirmed' if payment_method == 'wallet' else 'pending',
+                sub_total = subtotal,
+                shipping_charge = shipping,
+                coupon_discount = coupon_discount,
+                total_amount = grand_total,
+            )
 
-            price = item.price,
-            original_price = item.product.base_price,
-            discount_amount = item.product.base_price - item.price,
-            quantity = item.quantity,
-        )
+            # Deduct from Wallet if selected
+            if payment_method == 'wallet':
+                wallet, _ = Wallet.objects.get_or_create(user=request.user)
+                wallet.withdraw(
+                    grand_total,
+                    f"Payment for Order #{order_id}",
+                    transaction_type='payment',
+                    order=order
+                )
 
-        variant.stock -= item.quantity
-        variant.save()
+            # Record Coupon Usage
+            if coupon and coupon_discount > 0:
+                CouponUsage.objects.create(
+                    coupon=coupon,
+                    user=request.user,
+                    order=order,
+                    discount_amount=coupon_discount,
+                    cart_total_before_discount=subtotal
+                )
+                coupon.times_used += 1
+                coupon.save(update_fields=['times_used'])
 
-    cart_items.delete()
+            for item in cart_items:
+                variant = item.variant
+                if variant.stock < item.quantity:
+                    raise ValueError(f"Only {variant.stock} stock available for {item.product.product_name}")
+                
+                OrderItem.objects.create(
+                    order = order,
+                    product = item.product,
+                    variant = variant,
+                    product_name = item.product.product_name,
+                    variant_size = variant.size,
+                    variant_color = variant.color,
+                    price = item.price,
+                    original_price = item.product.base_price,
+                    discount_amount = item.product.base_price - item.price,
+                    quantity = item.quantity,
+                    item_status = 'confirmed' if payment_method == 'wallet' else 'placed'
+                )
+
+                variant.stock -= item.quantity
+                variant.save()
+
+            cart_items.delete()
+            request.session.pop('coupon_code', None)
+
+    except Exception as e:
+        messages.error(request, str(e))
+        return redirect('checkout')
 
     messages.success(request,"Order Placed Successfully")
-
     return redirect('order_success', order_id = order.order_id)
 
 @login_required
@@ -132,7 +227,6 @@ def order_success(request,order_id):
     order = get_object_or_404(Order, order_id = order_id, user= request.user)
     categories = Category.objects.filter(is_active=True)
     order_items = order.items.all()
-
 
     return render(request,'order_success.html',{
         'order': order,
@@ -142,11 +236,7 @@ def order_success(request,order_id):
 
 @login_required
 def my_order(request):
-
-    
-
     orders = Order.objects.filter(user=request.user).order_by('-created_at')
-
     categories = Category.objects.filter(is_active=True)
 
     context = {
@@ -158,7 +248,6 @@ def my_order(request):
 
 @login_required
 def cancel_order(request,order_id):
-
     categories = Category.objects.filter(is_active=True)
     order = get_object_or_404(Order, order_id=order_id,user=request.user)
 
@@ -173,24 +262,34 @@ def cancel_order(request,order_id):
     if request.method == 'POST':
         reason = request.POST.get('reason')
        
-        #Restore stock
-        for item in order.items.all():
-            if item.item_status.lower() not in ['cancelled', 'returned']:
-                variant = item.variant
+        with transaction.atomic():
+            #Restore stock
+            for item in order.items.all():
+                if item.item_status.lower() not in ['cancelled', 'returned']:
+                    variant = item.variant
+                    variant.stock += item.quantity
+                    variant.save()
 
-                variant.stock += item.quantity
-                variant.save()
+                    item.item_status = 'cancelled'
+                    item.save()
 
-                item.item_status = 'cancelled'
-                item.save()
+            order.status = 'cancelled'
+            order.cancellation_reason = reason
+            order.update_total()
+            order.save()
 
-        order.status = 'cancelled'
-        order.cancellation_reason = reason
-        order.update_total()
-        order.save()
+            # Process refund directly if paid via online or wallet
+            if order.payment_method in ['online', 'wallet']:
+                wallet, _ = Wallet.objects.get_or_create(user=order.user)
+                wallet.deposit(
+                    amount=order.total_amount,
+                    description=f"Refund for cancelled Order #{order.order_id}",
+                    transaction_type='refund',
+                    order=order
+                )
+                messages.success(request, f"Refund of ₹{order.total_amount} credited to your wallet.")
 
         messages.success(request, 'Order cancelled Successfully')
-
         return redirect('order_details', order_id=order.order_id)
 
     return render(request,'order_cancel.html', {
@@ -213,45 +312,55 @@ def cancel_order_item(request, item_id):
             order_id=order_item.order.order_id
         )
 
-    #cancel the item
-    order_item.item_status = 'cancelled'
-    order_item.save()
+    with transaction.atomic():
+        #cancel the item
+        order_item.item_status = 'cancelled'
+        order_item.save()
 
-    # Restore stock
-    variant = order_item.variant
-    variant.stock += order_item.quantity
-    variant.save()
+        # Restore stock
+        variant = order_item.variant
+        variant.stock += order_item.quantity
+        variant.save()
 
-    remaining_items = order_item.order.items.exclude(
-        item_status__in=['cancelled', 'returned']
-    )
+        order = order_item.order
+        remaining_items = order.items.exclude(
+            item_status__in=['cancelled', 'returned']
+        )
 
-    if not remaining_items.exists():
-        order_item.order.status = 'cancelled'
-        order_item.order.save()
+        if not remaining_items.exists():
+            order.status = 'cancelled'
+            order.save()
+
+        # Update totals
+        order.update_total()
+        order.refresh_from_db()
+
+        # Refund item value to wallet if paid via online/wallet
+        if order.payment_method in ['online', 'wallet']:
+            refund_amount = order_item.price * order_item.quantity
+            wallet, _ = Wallet.objects.get_or_create(user=order.user)
+            wallet.deposit(
+                amount=refund_amount,
+                description=f"Refund for cancelled item {order_item.product_name} in Order #{order.order_id}",
+                transaction_type='refund',
+                order=order
+            )
+            messages.success(request, f"Refund of ₹{refund_amount} credited to your wallet.")
 
     messages.success(request, "Item cancelled successfully.")
-
-    order = order_item.order
-
-    order.update_total()
-    order.refresh_from_db()
-
-    print("New subtotal:", order.sub_total)
-    print("New total:", order.total_amount)
-
     return redirect(
         'order_details',
-        order_id=order_item.order.order_id
+        order_id=order.order_id
     )
 
 @login_required
 def order_details(request, order_id):
-
     order = get_object_or_404(Order, order_id = order_id, user = request.user)
+    coupons = Coupon.objects.filter(is_active=True) 
 
     context = {
         'order': order,
+        'coupons': coupons,
         'order_items': order.items.all(),
         'categories': Category.objects.filter(is_active=True),
     }
@@ -260,7 +369,6 @@ def order_details(request, order_id):
 
 @login_required
 def return_order(request, order_id):
-
     order = get_object_or_404(Order, order_id = order_id, user = request.user) 
 
     if order.status.lower() != 'delivered':
@@ -275,25 +383,19 @@ def return_order(request, order_id):
             messages.error(request,'Return reason is required')
             return redirect('return_order', order_id = order.order_id) 
         
-        # Restore stock
-        for item in order.items.all():
-            if item.item_status.lower() not in ['cancelled', 'returned']:
-                variant = item.variant
-
-                variant.stock += item.quantity
-                variant.save()
-
-                item.item_status = 'returned'
-                item.save()
-
-        order.status = 'returned'
+        # Mark status as return_requested instead of returned immediately
+        order.status = 'return_requested'
         order.return_reason = reason
         order.save()
+
+        # Mark non-cancelled items as return_requested
+        order.items.exclude(item_status__in=['cancelled', 'returned']).update(item_status='return_requested')
 
         messages.success(request, 'Return request submitted successfully')
         return redirect('my_orders')
 
     return render(request, 'return_order_item.html', { 'order': order }) 
+
 
 
 @login_required

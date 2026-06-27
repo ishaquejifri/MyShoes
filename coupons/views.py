@@ -390,6 +390,52 @@ def user_coupon_usage_history(request):
      }
 
      return render(request, 'user_coupons_history.html', context)
+
+
+@login_required(login_url='login')
+def apply_coupon(request):
+    if request.method == 'POST':
+        coupon_code = request.POST.get('coupon_code', '').strip().upper()
+        if not coupon_code:
+            messages.error(request, "Please enter a coupon code.")
+            return redirect('checkout')
+
+        try:
+            coupon = Coupon.objects.get(code=coupon_code)
+            is_valid, msg = coupon.is_valid()
+            if not is_valid:
+                messages.error(request, msg)
+                return redirect('checkout')
+
+            can_use, msg_use = coupon.can_user_use(request.user)
+            if not can_use:
+                messages.error(request, msg_use)
+                return redirect('checkout')
+
+            # Fetch cart total
+            from cart.models import Cart
+            cart = get_object_or_404(Cart, user=request.user)
+            subtotal = sum(item.subtotal() for item in cart.items.all())
+
+            if subtotal < coupon.min_purchase_amount:
+                messages.error(request, f"Minimum purchase amount of ₹{coupon.min_purchase_amount} is required.")
+                return redirect('checkout')
+
+            request.session['coupon_code'] = coupon.code
+            messages.success(request, f"Coupon '{coupon.code}' applied successfully!")
+
+        except Coupon.DoesNotExist:
+            messages.error(request, "Invalid coupon code.")
+
+    return redirect('checkout')
+
+
+@login_required(login_url='login')
+def remove_coupon(request):
+    request.session.pop('coupon_code', None)
+    messages.success(request, "Coupon removed successfully.")
+    return redirect('checkout')
+
                       
           
 
