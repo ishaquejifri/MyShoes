@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'accounts',
     'adminpanel',
     'category',
+    'payments',
     'products',
     'cart',
     'coupons',

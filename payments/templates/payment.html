@@ -8,7 +8,7 @@
       href="https://fonts.googleapis.com/css2?display=swap&amp;family=Manrope%3Awght%40400%3B500%3B700%3B800&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
     />
 
-    <title>Payment Failed</title>
+    <title>Payment</title>
     <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -34,9 +34,7 @@
                 ></path>
               </svg>
             </div>
-            <a href="{% url 'home' %}">
             <h2 class="text-[#111718] text-lg font-bold leading-tight tracking-[-0.015em]">Lotto Shoes</h2>
-            </a>
           </div>
           <div class="flex flex-1 justify-end gap-8">
             <div class="flex items-center gap-9">
@@ -171,13 +169,43 @@
             </div>
           </div>
           <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
-            <div class="flex flex-wrap justify-between gap-3 p-4"><p class="text-[#111718] tracking-light text-[32px] font-bold leading-tight min-w-72">Payment Failed</p></div>
+            <div class="flex flex-wrap justify-between gap-3 p-4"><p class="text-[#111718] tracking-light text-[32px] font-bold leading-tight min-w-72"></p></div>
             
-                 <p class="text-gray-600 dark:text-dark-300 max-w-lg text-sm md:text-base mb-8 leading-relaxed">
-                Unfortunately, your payment could not be processed.  
-                This may happen due to network issues or interrupted transactions.  
-                You can try again or review your order details below.
-                </p>
+            <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+          <button id="pay-btn">
+            Pay Now
+          </button>
+
+          <script>
+          var options = {
+              "key": "{{ razorpay_key }}",
+              "amount": "{{ amount }}",
+              "currency": "INR",
+              "name": "MyShoes",
+              "description": "Order Payment",
+              "order_id": "{{ razorpay_order_id }}",
+
+              "handler": function(response){
+
+                  window.location.href =
+                  "/payment-success/?payment_id=" +
+                  response.razorpay_payment_id +
+                  "&order_id=" +
+                  response.razorpay_order_id +
+                  "&signature=" +
+                  response.razorpay_signature;
+              }
+          };
+
+          var rzp = new Razorpay(options);
+
+          document.getElementById("pay-btn").onclick =
+          function(e){
+              rzp.open();
+              e.preventDefault();
+          }
+          </script> 
             
           </div>     
         </div>

@@ -17,6 +17,7 @@ class Order(models.Model):
     postal_code = models.CharField(max_length=20)
 
     STATUS_CHOICES = [
+             
         ("pending","Pending"),
         ("confirmed","Confirmed"),
         ("processing","Processing"),
@@ -33,6 +34,14 @@ class Order(models.Model):
         ("cod","Cash on Delivery"),
         ("online","Online Payment"),
         ("wallet","Wallet"),
+    ]
+
+    PAYMENT_STATUS = [
+        ('Paid', 'Paid'),
+        ('Pending', 'Pending'),
+        ('Failed', 'Failed'),
+        ('Cancelled', 'Cancelled'),
+        ('Refunded', 'Refunded'),
     ]
 
     status = models.CharField(max_length=200,choices=STATUS_CHOICES,default='pending')
