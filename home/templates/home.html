@@ -149,6 +149,13 @@
                   class="flex min-h-[480px] flex-col gap-6 bg-cover bg-center bg-no-repeat @[480px]:gap-8 @[480px]:rounded-lg items-start justify-end px-4 pb-10 @[480px]:px-10"
                   style='background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0.4) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuBEAtYMtPTioxQKShNsku_m__DFhA85OWpffH7w4utxw9ZlNKLVXiYGWSG1Rly8kVzPrcFp5dUviPIheNmS5PFDEZFK4X9nxGDdVJf4eACKNb9uKv4SKcwAYyoc9BREENyKWdgl9cnH_3-sZqHZTyrZtwzf4KVcDPsbytUJWvQfWv4NygkgCNXYJd3MLIOYzhF_RIIjcuykLXMqxIfqAu9gDVtEOU3t6ub2SLRsaglgDUyxWBdlG983YVjrd4gO25zBIYykSRLAllgu");'
                 >
+                {% for banner in banners %}
+                  <div>
+                      <img src="{{ banner.image.url }}" style="width:100%">
+                      <h2>{{ banner.title }}</h2>
+                      <p>{{ banner.subtitle }}</p>
+                  </div>
+                  {% endfor %}
                   <div class="flex flex-col gap-2 text-left">
                     <h1
                       class="text-white text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"

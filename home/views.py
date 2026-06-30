@@ -6,13 +6,16 @@ from django.core.paginator import Paginator
 from wishlist.models import Wishlist
 from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import login_required
+from banner.models import Banner
+from django.utils import timezone
 
 
 
 
 def home_page(request):
 
-    categories = Category.objects.filter(is_active=True)   
+    categories = Category.objects.filter(is_active=True)
+    banners = Banner.objects.filter(is_active=True)
     products = Product.objects.select_related('category').filter(
         is_deleted=False,
         is_available=True,
@@ -22,7 +25,8 @@ def home_page(request):
 
     return render(request,'home.html', {
         'categories' : categories,
-        'products' : products  
+        'products' : products,
+        'banners': banners,  
     })
 
 
