@@ -8,6 +8,7 @@ from django.views.decorators.cache import never_cache
 from django.contrib.auth.decorators import login_required
 from banner.models import Banner
 from django.utils import timezone
+from coupons.models import Coupon
 
 
 
@@ -105,7 +106,7 @@ def user_product_list(request, category_id=None):
 @login_required
 def user_product_details(request,pk):
     categories = Category.objects.filter(is_active=True)
-
+    coupons = Coupon.objects.filter(is_active=True) 
     product = get_object_or_404(Product,
                                  pk=pk,
                                  is_deleted=False
@@ -146,6 +147,7 @@ def user_product_details(request,pk):
         'total_stock': total_stock,
         'sizes': sizes,
         'colors': colors,
+        'coupons': coupons,
     })
 
 

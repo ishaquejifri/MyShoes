@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'payments',
     'offers',
     'products',
+    'reviews',
     'cart',
     'coupons',
     'wishlist',
